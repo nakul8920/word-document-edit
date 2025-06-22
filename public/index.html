@@ -1467,7 +1467,7 @@
                 <div class="form-column">
                     <h3>Seller Details</h3>
                     <div class="form-group">
-                        <label for="seller1Name">Seller 1 Name</label>
+                        <label for="seller1Name">Seller 1 Name(Enter alphabets only)</label>
                         <input name="seller1Name" id="seller1Name" required>
                     </div>
                     <div class="form-group">
@@ -1475,7 +1475,7 @@
                         <input name="seller1Pan" id="seller1Pan" required>
                     </div>
                     <div class="form-group">
-                        <label for="seller1Aadhar">Seller 1 Aadhar</label>
+                        <label for="seller1Aadhar">Seller 1 Aadhar(Enter numbers only)</label>
                         <input name="seller1Aadhar" id="seller1Aadhar" required>
                     </div>
                     <div class="form-group">
@@ -1490,7 +1490,7 @@
                 <div class="form-column">
                     <h3>Buyer Details</h3>
                     <div class="form-group">
-                        <label for="buyer1Name">Buyer 1 Name</label>
+                        <label for="buyer1Name">Buyer 1 Name(Enter alphabets only)</label>
                         <input name="buyer1Name" id="buyer1Name" required>
                     </div>
                     <div class="form-group">
@@ -1498,7 +1498,7 @@
                         <input name="buyer1Pan" id="buyer1Pan" required>
                     </div>
                     <div class="form-group">
-                        <label for="buyer1Aadhar">Buyer 1 Aadhar</label>
+                        <label for="buyer1Aadhar">Buyer 1 Aadhar(Enter numbers only)</label>
                         <input name="buyer1Aadhar" id="buyer1Aadhar" required>
                     </div>
                     <div class="form-group">
@@ -1516,11 +1516,11 @@
                 <h3>Property Details</h3>
                 <div class="property-grid">
                     <div class="form-group">
-                        <label for="flatNo">Flat No</label>
+                        <label for="flatNo">Flat No(Enter number only)</label>
                         <input name="flatNo" id="flatNo" required>
                     </div>
                     <div class="form-group">
-                        <label for="unitType">Unit Type</label>
+                        <label for="unitType">Unit Type(Enter capital alphabet only)</label>
                         <input name="unitType" id="unitType" required>
                     </div>
                     <div class="form-group">
@@ -2406,7 +2406,8 @@
                 'flatNo', 'unitNo', 'floorNo',
                 'flatNo2', 'unitNo2', 'floorNo2',
                 'flatNo3', 'unitNo3', 'floorNo3',
-                'flatNo4', 'unitNo4', 'floorNo4'
+                'flatNo4', 'unitNo4', 'floorNo4',
+                'towerNo', 'towerNo2', 'towerNo3', 'towerNo4' // <-- Added towerNo fields
             ];
             naturalNumberFields.forEach(function (id) {
                 const el = document.getElementById(id);

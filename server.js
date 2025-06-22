@@ -158,6 +158,55 @@ app.post('/generate3', multer().none(), (req, res) => {
     }
 });
 
+// Handle 2 Buyer, 1 Seller form submission
+app.post('/generate4', multer().none(), (req, res) => {
+    const data = req.body;
+    const templatePath = path.join(__dirname, 'templates', 'Ats PR 2B Vs 1S.docx');
+    const content = fs.readFileSync(templatePath, 'binary');
+    const zip = new PizZip(content);
+    const doc = new Docxtemplater(zip, { paragraphLoop: true, linebreaks: true });
+
+    // Map form fields to placeholders for 2 Buyers, 1 Seller
+    doc.setData({
+        SELLER_1_NAME: data.seller1Name || '',
+        SELLER_1_PAN: data.seller1Pan,
+        SELLER_1_AADHAR: data.seller1Aadhar,
+        SELLER_1_HUSBAND_WIFE_DAUGHTER_NAME: data.seller1Relation,
+        SELLER_1_ADDRESS: data.seller1Address,
+        FLAT_NO: data.flatNo,
+        UNIT_NO: data.unitNo,
+        UNIT_SIZE: data.unitSize,
+        UNIT_TYPE: data.unitType,
+        FLOOR_NO: data.floorNo,
+        TOWER_NO: data.towerNo,
+        PROPERTY_NAME: data.propertyName,
+        PROPERTY_ADDRESS: data.propertyAddress,
+        BUYER_1_NAME: data.buyer1Name,
+        BUYER_1_PAN: data.buyer1Pan,
+        BUYER_1_AADHAR: data.buyer1Aadhar,
+        BUYER_1_HUSBAND_WIFE_DAUGHTER_NAME: data.buyer1Relation,
+        BUYER_2_NAME: data.buyer2Name,
+        BUYER_2_PAN: data.buyer2Pan,
+        BUYER_2_AADHAR: data.buyer2Aadhar,
+        BUYER_2_HUSBAND_WIFE_DAUGHTER_NAME: data.buyer2Relation,
+        BUYER_2_ADDRESS: data.buyer2Address,
+        COMPANY_NAME: data.companyName,
+        COMPANY_ADDRESS: data.companyAddress
+    });
+
+    try {
+        doc.render();
+        const buf = doc.getZip().generate({ type: 'nodebuffer' });
+        res.set({
+            'Content-Type': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'Content-Disposition': 'attachment; filename=customized.docx'
+        });
+        res.send(buf);
+    } catch (error) {
+        res.status(500).send('Error generating document');
+    }
+});
+
 app.listen(3000, () => {
     console.log('Server running at http://localhost:3000');
 }); 
