@@ -1,0 +1,2631 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Word Document Editor</title>
+    <script src="https://unpkg.com/docx@7.8.2/build/index.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1c2526 0%, #3a4f50 50%, #6d8299 100%);
+            position: relative;
+            min-height: 100vh;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            /* background: linear-gradient(120deg, #f6d365cc 0%, #fda085cc 100%); */
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .header,
+        .container,
+        .form-section,
+        .preview-section,
+        #docForm,
+        #docForm2,
+        #docForm3,
+        #docForm4 {
+            position: relative;
+            z-index: 1;
+        }
+
+        .form-section,
+        .preview-section,
+        #docForm,
+        #docForm2,
+        #docForm3,
+        #docForm4 {
+            background: rgba(255, 255, 255, 0.85);
+            /* keep existing gradient if you want, but add transparency */
+        }
+
+        .header {
+            background: linear-gradient(135deg, rgba(255, 107, 107, 0.9) 0%, rgba(255, 142, 83, 0.9) 100%);
+            color: white;
+            padding: 3rem;
+            text-align: center;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0) 100%);
+            z-index: 1;
+        }
+
+        .header h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            position: relative;
+            z-index: 2;
+            letter-spacing: 2px;
+            background: linear-gradient(to right, #ffffff, #f0f0f0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: titleGlow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes titleGlow {
+            from {
+                text-shadow: 0 0 10px rgba(255, 255, 255, 0.5),
+                    0 0 20px rgba(255, 255, 255, 0.3),
+                    0 0 30px rgba(255, 255, 255, 0.2);
+            }
+
+            to {
+                text-shadow: 0 0 20px rgba(255, 255, 255, 0.6),
+                    0 0 30px rgba(255, 255, 255, 0.4),
+                    0 0 40px rgba(255, 255, 255, 0.3);
+            }
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+            display: flex;
+            gap: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .form-section,
+        .preview-section {
+            background: linear-gradient(135deg,
+                    rgba(255, 255, 255, 0.95) 0%,
+                    rgba(255, 255, 255, 0.85) 100%);
+            padding: 2.5rem;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            flex: 1;
+            backdrop-filter: blur(10px);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .form-section::before,
+        .preview-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg,
+                    rgba(255, 107, 107, 0.1) 0%,
+                    rgba(255, 142, 83, 0.1) 100%);
+            z-index: -1;
+        }
+
+        .form-section:hover,
+        .preview-section:hover {
+            transform: translateY(-5px) scale(1.01);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .form-section {
+            max-width: 600px;
+        }
+
+        .preview-section {
+            min-width: 600px;
+        }
+
+        .form-group {
+            margin-bottom: 1.8rem;
+            position: relative;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.7rem;
+            font-weight: 600;
+            color: #2d3748;
+            transition: all 0.3s ease;
+            font-size: 1.1rem;
+            text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.5);
+        }
+
+        input {
+            width: 100%;
+            padding: 1rem 1.2rem;
+            border: 2px solid rgba(255, 107, 107, 0.3);
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.9);
+            color: #2d3748;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #FF6B6B;
+            box-shadow: 0 0 0 4px rgba(255, 107, 107, 0.1);
+            background: white;
+            transform: translateY(-2px);
+        }
+
+        textarea {
+            width: 100%;
+            height: 700px;
+            padding: 1.2rem;
+            border: 2px solid rgba(255, 107, 107, 0.3);
+            border-radius: 12px;
+            font-size: 1rem;
+            line-height: 1.6;
+            resize: vertical;
+            white-space: pre-wrap;
+            background: rgba(255, 255, 255, 0.9);
+            transition: all 0.3s ease;
+            color: #2d3748;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #FF6B6B;
+            box-shadow: 0 0 0 4px rgba(255, 107, 107, 0.1);
+            background: white;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1.2rem;
+            margin-top: 2rem;
+        }
+
+        button {
+            background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%);
+            color: white;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            position: relative;
+            overflow: hidden;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: 0.5s;
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4);
+        }
+
+        button:hover::before {
+            left: 100%;
+        }
+
+        button:active {
+            transform: translateY(-1px);
+        }
+
+        .preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1.2rem;
+            border-bottom: 2px solid rgba(255, 107, 107, 0.2);
+        }
+
+        .preview-header h2 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        @media (max-width: 1400px) {
+            .container {
+                max-width: 95%;
+                padding: 0 1rem;
+            }
+        }
+
+        @media (max-width: 1200px) {
+            .container {
+                flex-direction: column;
+                gap: 2rem;
+            }
+
+            .form-section,
+            .preview-section {
+                max-width: 100%;
+                min-width: auto;
+            }
+
+            .header h1 {
+                font-size: 3rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 2rem 1rem;
+            }
+
+            .header h1 {
+                font-size: 2.5rem;
+            }
+
+            .form-section,
+            .preview-section {
+                padding: 1.5rem;
+                border-radius: 15px;
+            }
+
+            .form-group {
+                margin-bottom: 1.5rem;
+            }
+
+            input,
+            textarea {
+                padding: 0.8rem 1rem;
+                font-size: 1rem;
+            }
+
+            .button-group {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .preview-header h2 {
+                font-size: 1.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header {
+                padding: 1.5rem 1rem;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+                letter-spacing: 1px;
+            }
+
+            .container {
+                margin: 1rem auto;
+            }
+
+            .form-section,
+            .preview-section {
+                padding: 1rem;
+                border-radius: 12px;
+            }
+
+            label {
+                font-size: 1rem;
+                margin-bottom: 0.5rem;
+            }
+
+            input,
+            textarea {
+                padding: 0.7rem 0.9rem;
+                font-size: 0.95rem;
+                border-radius: 8px;
+            }
+
+            .preview-header {
+                margin-bottom: 1.5rem;
+                padding-bottom: 1rem;
+            }
+
+            .preview-header h2 {
+                font-size: 1.3rem;
+            }
+
+            textarea {
+                height: 500px;
+            }
+        }
+
+        @media (max-width: 320px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .form-section,
+            .preview-section {
+                padding: 0.8rem;
+            }
+
+            input,
+            textarea {
+                padding: 0.6rem 0.8rem;
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-height: 500px) and (orientation: landscape) {
+            .header {
+                padding: 1rem;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .container {
+                margin: 1rem auto;
+            }
+
+            textarea {
+                height: 300px;
+            }
+        }
+
+        @media (min-width: 768px) and (max-width: 1024px) and (orientation: portrait) {
+            .container {
+                max-width: 90%;
+            }
+
+            .form-section,
+            .preview-section {
+                padding: 2rem;
+            }
+
+            textarea {
+                height: 600px;
+            }
+        }
+
+        @media (min-width: 1024px) and (max-width: 1366px) and (orientation: landscape) {
+            .container {
+                max-width: 95%;
+            }
+
+            .form-section {
+                max-width: 45%;
+            }
+
+            .preview-section {
+                min-width: 45%;
+            }
+        }
+
+        @media (min-width: 1920px) {
+            .container {
+                max-width: 1800px;
+            }
+
+            .header h1 {
+                font-size: 4.5rem;
+            }
+
+            input,
+            textarea {
+                font-size: 1.2rem;
+            }
+
+            label {
+                font-size: 1.3rem;
+            }
+        }
+
+        @media print {
+            body {
+                background: none;
+            }
+
+            .header,
+            .button-group {
+                display: none;
+            }
+
+            .container {
+                display: block;
+                margin: 0;
+                padding: 0;
+            }
+
+            .form-section,
+            .preview-section {
+                box-shadow: none;
+                border: none;
+                padding: 0;
+            }
+
+            textarea {
+                border: none;
+                height: auto;
+            }
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%);
+            border-radius: 5px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #FF8E53 0%, #FF6B6B 100%);
+        }
+
+        /* Form section animations */
+        .form-group {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.5s ease forwards;
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .form-group:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .form-group:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .form-group:nth-child(3) {
+            animation-delay: 0.3s;
+        }
+
+        .form-group:nth-child(4) {
+            animation-delay: 0.4s;
+        }
+
+        .form-group:nth-child(5) {
+            animation-delay: 0.5s;
+        }
+
+        .form-group:nth-child(6) {
+            animation-delay: 0.6s;
+        }
+
+        .form-group:nth-child(7) {
+            animation-delay: 0.7s;
+        }
+
+        .form-group:nth-child(8) {
+            animation-delay: 0.8s;
+        }
+
+        .form-group:nth-child(9) {
+            animation-delay: 0.9s;
+        }
+
+        .form-group:nth-child(10) {
+            animation-delay: 1s;
+        }
+
+        /* Input focus effects */
+        .form-group::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%);
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+        }
+
+        .form-group:focus-within::after {
+            width: 100%;
+        }
+
+        /* Glowing effect on hover */
+        .form-section:hover,
+        .preview-section:hover {
+            box-shadow: 0 0 30px rgba(255, 107, 107, 0.3);
+        }
+
+        /* Add these styles to your existing CSS */
+        .invalid-pan {
+            border-color: #ff0000 !important;
+            box-shadow: 0 0 0 2px rgba(255, 0, 0, 0.1) !important;
+        }
+
+        .valid-pan {
+            border-color: #00ff00 !important;
+            box-shadow: 0 0 0 2px rgba(0, 255, 0, 0.1) !important;
+        }
+
+        .pan-error {
+            color: #ff0000;
+            font-size: 0.8rem;
+            margin-top: 0.25rem;
+            display: none;
+        }
+
+        .pan-error.show {
+            display: block;
+        }
+
+        /* Add these styles to your existing CSS */
+        .invalid-aadhar {
+            border-color: #ff0000 !important;
+            box-shadow: 0 0 0 2px rgba(255, 0, 0, 0.1) !important;
+        }
+
+        .valid-aadhar {
+            border-color: #00ff00 !important;
+            box-shadow: 0 0 0 2px rgba(0, 255, 0, 0.1) !important;
+        }
+
+        .aadhar-error {
+            color: #ff0000;
+            font-size: 0.8rem;
+            margin-top: 0.25rem;
+            display: none;
+        }
+
+        .aadhar-error.show {
+            display: block;
+        }
+
+        /* --- Option Button Styling --- */
+        #main {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 80vh;
+            padding: 2rem 1rem;
+        }
+
+        .hero-header {
+            text-align: center;
+            margin-bottom: 3rem;
+            max-width: 800px;
+        }
+
+        .main-title {
+            font-size: 3.5rem;
+            font-weight: 800;
+            color: #ffffff;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
+            margin-bottom: 1.5rem;
+            letter-spacing: 2px;
+            background: linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: titleGlow 3s ease-in-out infinite alternate;
+        }
+
+        .main-description {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.9);
+            text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.3);
+            line-height: 1.6;
+            font-weight: 400;
+        }
+
+        @keyframes titleGlow {
+            from {
+                text-shadow: 0 0 20px rgba(255, 255, 255, 0.6),
+                    0 0 30px rgba(255, 255, 255, 0.4),
+                    0 0 40px rgba(255, 255, 255, 0.3);
+            }
+            to {
+                text-shadow: 0 0 30px rgba(255, 255, 255, 0.8),
+                    0 0 40px rgba(255, 255, 255, 0.6),
+                    0 0 50px rgba(255, 255, 255, 0.4);
+            }
+        }
+
+        .option-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 22px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            padding: 2.5rem 2.5rem 1.5rem 2.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 2.5rem;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            min-width: 320px;
+            max-width: 350px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .option-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+            z-index: -1;
+        }
+
+        .option-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            border-color: rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .option-card:hover::before {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.1) 100%);
+        }
+
+        .option-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.1) 100%);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: #ffffff;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .option-card:hover .option-avatar {
+            transform: scale(1.1);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .option-title {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 0.8rem;
+            letter-spacing: 1px;
+            text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .option-filename {
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 0.2rem;
+            font-weight: 500;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        /* --- Form Styling --- */
+        #docForm,
+        #docForm2,
+        #docForm3,
+        #docForm4 {
+            background: #fff;
+            border-radius: 22px;
+            box-shadow: 0 8px 32px rgba(255, 107, 107, 0.18);
+            padding: 2.5rem;
+            max-width: 1000px;
+            width: 100%;
+            margin: 0 auto;
+            display: none;
+            flex-direction: column;
+            gap: 1.5rem;
+            animation: fadeInForm 0.5s;
+        }
+
+        #docForm h2,
+        #docForm2 h2,
+        #docForm3 h2,
+        #docForm4 h2 {
+            text-align: center;
+            color: #ff5858;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            letter-spacing: 1px;
+        }
+
+        .form-section-columns {
+            display: flex;
+            gap: 2.5rem;
+            width: 100%;
+        }
+
+        .form-column {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-column h3, .details-section h3 {
+            font-size: 1.5rem;
+            color: #ff5858;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #f6d365;
+        }
+
+        .details-section {
+            margin-top: 1.5rem;
+        }
+
+        .property-grid,
+        .company-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.2rem 2.5rem;
+        }
+
+        @media (max-width: 1200px) {
+            #docForm, #docForm2, #docForm3, #docForm4 {
+                max-width: 95%;
+            }
+            .form-section-columns {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .option-card {
+                min-width: 90vw;
+                max-width: 98vw;
+                padding: 1.2rem 0.5rem 1rem 0.5rem;
+            }
+
+            #docForm,
+            #docForm2,
+            #docForm3,
+            #docForm4 {
+                padding: 1.2rem 0.5rem;
+                border-radius: 12px;
+            }
+        }
+
+        #propertyName,
+        #customPropertyName {
+            width: 100%;
+            padding: 0.9rem 1.1rem;
+            border: 2px solid #f6d365;
+            border-radius: 12px;
+            font-size: 1rem;
+            background: #f9f9f9;
+            transition: border 0.2s, box-shadow 0.2s;
+            margin-bottom: 0.2rem;
+        }
+
+        #propertyName:focus,
+        #customPropertyName:focus {
+            border-color: #ff5858;
+            box-shadow: 0 0 0 2px #ff585833;
+            outline: none;
+            background: #fff;
+        }
+
+        #propertyAddress,
+        #customPropertyAddress {
+            width: 100%;
+            padding: 0.9rem 1.1rem;
+            border: 2px solid #f6d365;
+            border-radius: 12px;
+            font-size: 1rem;
+            background: #f9f9f9;
+            transition: border 0.2s, box-shadow 0.2s;
+            margin-bottom: 0.2rem;
+        }
+
+        #propertyAddress:focus,
+        #customPropertyAddress:focus {
+            border-color: #ff5858;
+            box-shadow: 0 0 0 2px #ff585833;
+            outline: none;
+            background: #fff;
+        }
+
+        #companyName,
+        #customCompanyName,
+        #companyAddress,
+        #customCompanyAddress {
+            width: 100%;
+            padding: 0.9rem 1.1rem;
+            border: 2px solid #f6d365;
+            border-radius: 12px;
+            font-size: 1rem;
+            background: #f9f9f9;
+            transition: border 0.2s, box-shadow 0.2s;
+            margin-bottom: 0.2rem;
+        }
+
+        #companyName:focus,
+        #customCompanyName:focus,
+        #companyAddress:focus,
+        #customCompanyAddress:focus {
+            border-color: #ff5858;
+            box-shadow: 0 0 0 2px #ff585833;
+            outline: none;
+            background: #fff;
+        }
+
+        /* --- Form 2 Styling (Same as Form 1) --- */
+        #docForm2 {
+            background: #fff;
+            border-radius: 22px;
+            box-shadow: 0 8px 32px rgba(255, 107, 107, 0.18);
+            padding: 2.5rem 2rem 2rem 2rem;
+            max-width: 940px;
+            width: 100%;
+            margin: 0 auto;
+            display: none;
+            flex-direction: column;
+            gap: 1.2rem;
+            animation: fadeInForm 0.5s;
+        }
+
+        #docForm2 h2 {
+            text-align: center;
+            color: #ff5858;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            letter-spacing: 1px;
+        }
+
+        #docForm2 input {
+            width: 100%;
+            padding: 0.9rem 1.1rem;
+            border: 2px solid #f6d365;
+            border-radius: 12px;
+            font-size: 1rem;
+            background: #f9f9f9;
+            transition: border 0.2s, box-shadow 0.2s;
+            margin-bottom: 0.2rem;
+        }
+
+        #docForm2 input:focus {
+            border-color: #ff5858;
+            box-shadow: 0 0 0 2px #ff585833;
+            outline: none;
+            background: #fff;
+        }
+
+        #docForm2 button[type='submit'] {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(90deg, #ff5858 0%, #f09819 100%);
+            color: #fff;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            margin-top: 1rem;
+            box-shadow: 0 4px 16px rgba(255, 107, 107, 0.15);
+            transition: background 0.2s, transform 0.2s;
+        }
+
+        #docForm2 button[type='submit']:hover {
+            background: linear-gradient(90deg, #f09819 0%, #ff5858 100%);
+            transform: translateY(-2px) scale(1.02);
+        }
+
+        /* Property dropdowns for form 2 */
+        #propertyName2,
+        #customPropertyName2 {
+            width: 100%;
+            padding: 0.9rem 1.1rem;
+            border: 2px solid #f6d365;
+            border-radius: 12px;
+            font-size: 1rem;
+            background: #f9f9f9;
+            transition: border 0.2s, box-shadow 0.2s;
+            margin-bottom: 0.2rem;
+        }
+
+        #propertyName2:focus,
+        #customPropertyName2:focus {
+            border-color: #ff5858;
+            box-shadow: 0 0 0 2px #ff585833;
+            outline: none;
+            background: #fff;
+        }
+
+        #propertyAddress2,
+        #customPropertyAddress2 {
+            width: 100%;
+            padding: 0.9rem 1.1rem;
+            border: 2px solid #f6d365;
+            border-radius: 12px;
+            font-size: 1rem;
+            background: #f9f9f9;
+            transition: border 0.2s, box-shadow 0.2s;
+            margin-bottom: 0.2rem;
+        }
+
+        #propertyAddress2:focus,
+        #customPropertyAddress2:focus {
+            border-color: #ff5858;
+            box-shadow: 0 0 0 2px #ff585833;
+            outline: none;
+            background: #fff;
+        }
+
+        /* Company dropdowns for form 2 */
+        #companyName2,
+        #customCompanyName2,
+        #companyAddress2,
+        #customCompanyAddress2 {
+            width: 100%;
+            padding: 0.9rem 1.1rem;
+            border: 2px solid #f6d365;
+            border-radius: 12px;
+            font-size: 1rem;
+            background: #f9f9f9;
+            transition: border 0.2s, box-shadow 0.2s;
+            margin-bottom: 0.2rem;
+        }
+
+        #companyName2:focus,
+        #customCompanyName2:focus,
+        #companyAddress2:focus,
+        #customCompanyAddress2:focus {
+            border-color: #ff5858;
+            box-shadow: 0 0 0 2px #ff585833;
+            outline: none;
+            background: #fff;
+        }
+
+        @media (max-width: 600px) {
+            .option-card {
+                min-width: 90vw;
+                max-width: 98vw;
+                padding: 1.2rem 0.5rem 1rem 0.5rem;
+            }
+
+            #docForm,
+            #docForm2 {
+                padding: 1.2rem 0.5rem;
+                border-radius: 12px;
+            }
+        }
+
+        /* --- Form 3 Styling (Same as Form 1 & 2) --- */
+        #docForm3 {
+            background: #fff;
+            border-radius: 22px;
+            box-shadow: 0 8px 32px rgba(255, 107, 107, 0.18);
+            padding: 2.5rem 2rem 2rem 2rem;
+            max-width: 940px;
+            width: 100%;
+            margin: 0 auto;
+            display: none;
+            flex-direction: column;
+            gap: 1.2rem;
+            animation: fadeInForm 0.5s;
+        }
+
+        #docForm3 h2 {
+            text-align: center;
+            color: #ff5858;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            letter-spacing: 1px;
+        }
+
+        #docForm3 input {
+            width: 100%;
+            padding: 0.9rem 1.1rem;
+            border: 2px solid #f6d365;
+            border-radius: 12px;
+            font-size: 1rem;
+            background: #f9f9f9;
+            transition: border 0.2s, box-shadow 0.2s;
+            margin-bottom: 0.2rem;
+        }
+
+        #docForm3 input:focus {
+            border-color: #ff5858;
+            box-shadow: 0 0 0 2px #ff585833;
+            outline: none;
+            background: #fff;
+        }
+
+        #docForm3 button[type='submit'] {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(90deg, #ff5858 0%, #f09819 100%);
+            color: #fff;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            margin-top: 1rem;
+            box-shadow: 0 4px 16px rgba(255, 107, 107, 0.15);
+            transition: background 0.2s, transform 0.2s;
+        }
+
+        #docForm3 button[type='submit']:hover {
+            background: linear-gradient(90deg, #f09819 0%, #ff5858 100%);
+            transform: translateY(-2px) scale(1.02);
+        }
+
+        /* Property dropdowns for form 3 */
+        #propertyName3,
+        #customPropertyName3 {
+            width: 100%;
+            padding: 0.9rem 1.1rem;
+            border: 2px solid #f6d365;
+            border-radius: 12px;
+            font-size: 1rem;
+            background: #f9f9f9;
+            transition: border 0.2s, box-shadow 0.2s;
+            margin-bottom: 0.2rem;
+        }
+
+        #propertyName3:focus,
+        #customPropertyName3:focus {
+            border-color: #ff5858;
+            box-shadow: 0 0 0 2px #ff585833;
+            outline: none;
+            background: #fff;
+        }
+
+        #propertyAddress3,
+        #customPropertyAddress3 {
+            width: 100%;
+            padding: 0.9rem 1.1rem;
+            border: 2px solid #f6d365;
+            border-radius: 12px;
+            font-size: 1rem;
+            background: #f9f9f9;
+            transition: border 0.2s, box-shadow 0.2s;
+            margin-bottom: 0.2rem;
+        }
+
+        #propertyAddress3:focus,
+        #customPropertyAddress3:focus {
+            border-color: #ff5858;
+            box-shadow: 0 0 0 2px #ff585833;
+            outline: none;
+            background: #fff;
+        }
+
+        /* Company dropdowns for form 3 */
+        #companyName3,
+        #customCompanyName3,
+        #companyAddress3,
+        #customCompanyAddress3 {
+            width: 100%;
+            padding: 0.9rem 1.1rem;
+            border: 2px solid #f6d365;
+            border-radius: 12px;
+            font-size: 1rem;
+            background: #f9f9f9;
+            transition: border 0.2s, box-shadow 0.2s;
+            margin-bottom: 0.2rem;
+        }
+
+        #companyName3:focus,
+        #customCompanyName3:focus,
+        #companyAddress3:focus,
+        #customCompanyAddress3:focus {
+            border-color: #ff5858;
+            box-shadow: 0 0 0 2px #ff585833;
+            outline: none;
+            background: #fff;
+        }
+
+        @media (max-width: 600px) {
+            .option-card {
+                min-width: 90vw;
+                max-width: 98vw;
+                padding: 1.2rem 0.5rem 1rem 0.5rem;
+            }
+
+            #docForm,
+            #docForm2,
+            #docForm3 {
+                padding: 1.2rem 0.5rem;
+                border-radius: 12px;
+            }
+        }
+
+        /* --- Form 4 Styling (Same as Form 1, 2 & 3) --- */
+        #docForm4 {
+            background: #fff;
+            border-radius: 22px;
+            box-shadow: 0 8px 32px rgba(255, 107, 107, 0.18);
+            padding: 2.5rem 2rem 2rem 2rem;
+            max-width: 940px;
+            width: 100%;
+            margin: 0 auto;
+            display: none;
+            flex-direction: column;
+            gap: 1.2rem;
+            animation: fadeInForm 0.5s;
+        }
+
+        #docForm4 h2 {
+            text-align: center;
+            color: #ff5858;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            letter-spacing: 1px;
+        }
+
+        #docForm4 input {
+            width: 100%;
+            padding: 0.9rem 1.1rem;
+            border: 2px solid #f6d365;
+            border-radius: 12px;
+            font-size: 1rem;
+            background: #f9f9f9;
+            transition: border 0.2s, box-shadow 0.2s;
+            margin-bottom: 0.2rem;
+        }
+
+        #docForm4 input:focus {
+            border-color: #ff5858;
+            box-shadow: 0 0 0 2px #ff585833;
+            outline: none;
+            background: #fff;
+        }
+
+        #docForm4 button[type='submit'] {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(90deg, #ff5858 0%, #f09819 100%);
+            color: #fff;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            margin-top: 1rem;
+            box-shadow: 0 4px 16px rgba(255, 107, 107, 0.15);
+            transition: background 0.2s, transform 0.2s;
+        }
+
+        #docForm4 button[type='submit']:hover {
+            background: linear-gradient(90deg, #f09819 0%, #ff5858 100%);
+            transform: translateY(-2px) scale(1.02);
+        }
+
+        /* Property dropdowns for form 4 */
+        #propertyName4,
+        #customPropertyName4 {
+            width: 100%;
+            padding: 0.9rem 1.1rem;
+            border: 2px solid #f6d365;
+            border-radius: 12px;
+            font-size: 1rem;
+            background: #f9f9f9;
+            transition: border 0.2s, box-shadow 0.2s;
+            margin-bottom: 0.2rem;
+        }
+
+        #propertyName4:focus,
+        #customPropertyName4:focus {
+            border-color: #ff5858;
+            box-shadow: 0 0 0 2px #ff585833;
+            outline: none;
+            background: #fff;
+        }
+
+        #propertyAddress4,
+        #customPropertyAddress4 {
+            width: 100%;
+            padding: 0.9rem 1.1rem;
+            border: 2px solid #f6d365;
+            border-radius: 12px;
+            font-size: 1rem;
+            background: #f9f9f9;
+            transition: border 0.2s, box-shadow 0.2s;
+            margin-bottom: 0.2rem;
+        }
+
+        #propertyAddress4:focus,
+        #customPropertyAddress4:focus {
+            border-color: #ff5858;
+            box-shadow: 0 0 0 2px #ff585833;
+            outline: none;
+            background: #fff;
+        }
+
+        /* Company dropdowns for form 4 */
+        #companyName4,
+        #customCompanyName4,
+        #companyAddress4,
+        #customCompanyAddress4 {
+            width: 100%;
+            padding: 0.9rem 1.1rem;
+            border: 2px solid #f6d365;
+            border-radius: 12px;
+            font-size: 1rem;
+            background: #f9f9f9;
+            transition: border 0.2s, box-shadow 0.2s;
+            margin-bottom: 0.2rem;
+        }
+
+        #companyName4:focus,
+        #customCompanyName4:focus,
+        #companyAddress4:focus,
+        #customCompanyAddress4:focus {
+            border-color: #ff5858;
+            box-shadow: 0 0 0 2px #ff585833;
+            outline: none;
+            background: #fff;
+        }
+
+        @media (max-width: 600px) {
+            .option-card {
+                min-width: 90vw;
+                max-width: 98vw;
+                padding: 1.2rem 0.5rem 1rem 0.5rem;
+            }
+
+            #docForm,
+            #docForm2,
+            #docForm3,
+            #docForm4 {
+                padding: 1.2rem 0.5rem;
+                border-radius: 12px;
+            }
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2.5rem 2.5rem;
+            justify-items: center;
+            align-items: stretch;
+            margin-bottom: 2.5rem;
+        }
+
+        @media (max-width: 900px) {
+            .options-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+            .option-card {
+                min-width: 90vw;
+                max-width: 98vw;
+            }
+            .main-title {
+                font-size: 2.8rem;
+            }
+            .main-description {
+                font-size: 1.1rem;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .main-title {
+                font-size: 2.2rem;
+                letter-spacing: 1px;
+            }
+            .main-description {
+                font-size: 1rem;
+            }
+            .hero-header {
+                margin-bottom: 2rem;
+            }
+            .option-card {
+                min-width: 90vw;
+                max-width: 98vw;
+                padding: 1.5rem 1rem;
+            }
+            .option-avatar {
+                width: 60px;
+                height: 60px;
+                font-size: 2rem;
+            }
+            .option-title {
+                font-size: 1.4rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .main-title {
+                font-size: 1.8rem;
+            }
+            .main-description {
+                font-size: 0.9rem;
+            }
+            #main {
+                padding: 1rem 0.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="main">
+        <div class="hero-header">
+            <h1 class="main-title">Word Document Editor</h1>
+            <p class="main-description">Create professional property documents with ease. Choose your template and fill in the details to generate customized Word documents instantly.</p>
+        </div>
+        
+        <div class="options-grid">
+            <div class="option-card" id="optionCard">
+                <div class="option-avatar">
+                    <span>&#128100;</span>
+                </div>
+                <div class="option-title">1 Buyer, 1 Seller</div>
+                <div class="option-filename">Ats PR 1B Vs 1S.docx</div>
+            </div>
+
+            <div class="option-card" id="optionCard2">
+                <div class="option-avatar">
+                    <span>&#128101;</span>
+                </div>
+                <div class="option-title">2 Buyer, 2 Seller</div>
+                <div class="option-filename">Ats PR 2B Vs 2S.docx</div>
+            </div>
+
+            <div class="option-card" id="optionCard3">
+                <div class="option-avatar">
+                    <span>&#128100;</span>
+                </div>
+                <div class="option-title">1 Buyer, 2 Seller</div>
+                <div class="option-filename">Ats PR 1B Vs 2S.docx</div>
+            </div>
+
+            <div class="option-card" id="optionCard4">
+                <div class="option-avatar">
+                    <span>&#128101;</span>
+                </div>
+                <div class="option-title">2 Buyer, 1 Seller</div>
+                <div class="option-filename">Ats PR 2B Vs 1S.docx</div>
+            </div>
+        </div>
+        <form id="docForm" style="display:none;">
+            <h2>Fill Details - 1 Buyer, 1 Seller</h2>
+            <div class="form-section-columns">
+                <div class="form-column">
+                    <h3>Seller Details</h3>
+                    <div class="form-group">
+                        <label for="seller1Name">Seller 1 Name</label>
+                        <input name="seller1Name" id="seller1Name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="seller1Pan">Seller 1 PAN</label>
+                        <input name="seller1Pan" id="seller1Pan" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="seller1Aadhar">Seller 1 Aadhar</label>
+                        <input name="seller1Aadhar" id="seller1Aadhar" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="seller1Relation">Seller 1 Husband/Wife/Daughter Name</label>
+                        <input name="seller1Relation" id="seller1Relation" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="seller1Address">Seller 1 Address</label>
+                        <input name="seller1Address" id="seller1Address" required>
+                    </div>
+                </div>
+                <div class="form-column">
+                    <h3>Buyer Details</h3>
+                    <div class="form-group">
+                        <label for="buyer1Name">Buyer 1 Name</label>
+                        <input name="buyer1Name" id="buyer1Name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="buyer1Pan">Buyer 1 PAN</label>
+                        <input name="buyer1Pan" id="buyer1Pan" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="buyer1Aadhar">Buyer 1 Aadhar</label>
+                        <input name="buyer1Aadhar" id="buyer1Aadhar" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="buyer1Relation">Buyer 1 Husband/Wife/Daughter Name</label>
+                        <input name="buyer1Relation" id="buyer1Relation" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="buyer1Address">Buyer 1 Address</label>
+                        <input name="buyer1Address" id="buyer1Address" required>
+                    </div>
+                </div>
+            </div>
+
+            <div class="details-section">
+                <h3>Property Details</h3>
+                <div class="property-grid">
+                    <div class="form-group">
+                        <label for="flatNo">Flat No</label>
+                        <input name="flatNo" id="flatNo" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="unitType">Unit Type</label>
+                        <input name="unitType" id="unitType" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="unitSize">Unit Size</label>
+                        <input name="unitSize" id="unitSize" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="unitNo">Unit No</label>
+                        <input name="unitNo" id="unitNo" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="floorNo">Floor No</label>
+                        <input name="floorNo" id="floorNo" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="towerNo">Tower No</label>
+                        <input name="towerNo" id="towerNo" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="propertyName">Property Name</label>
+                        <select name="propertyName" id="propertyName" required>
+                            <option value="">Select Property</option>
+                            <option value="ATS PICTURESQUE REPRIEVES PHASE 2">ATS PICTURESQUE REPRIEVES PHASE 2</option>
+                            <option value="ATS Greens">ATS Greens</option>
+                            <option value="ATS Advantage">ATS Advantage</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        <input type="text" id="customPropertyName" name="customPropertyName" placeholder="Enter Property Name"
+                            style="display:none; margin-top:8px;">
+                    </div>
+                    <div class="form-group">
+                        <label for="propertyAddress">Property Address</label>
+                        <select name="propertyAddress" id="propertyAddress" required>
+                            <option value="">Select Address</option>
+                            <option value="Plot No. 16, Sector 135, Noida, 201301">Plot No. 16, Sector 135, Noida, 201301
+                            </option>
+                            <option value="Plot No. 17, Sector 150, Noida, 201310">Plot No. 17, Sector 150, Noida, 201310
+                            </option>
+                            <option value="Plot No. 18, Sector 93, Noida, 201304">Plot No. 18, Sector 93, Noida, 201304</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        <input type="text" id="customPropertyAddress" name="customPropertyAddress"
+                            placeholder="Enter Property Address" style="display:none; margin-top:8px;">
+                    </div>
+                </div>
+            </div>
+
+            <div class="details-section">
+                <h3>Company Details</h3>
+                <div class="company-grid">
+                    <div class="form-group">
+                        <label for="companyName">Company Name</label>
+                        <select name="companyName" id="companyName" required>
+                            <option value="">Select Company</option>
+                            <option value="ATS Homes Private Limited">ATS Homes Private Limited</option>
+                            <option value="ATS Infrastructure Ltd">ATS Infrastructure Ltd</option>
+                            <option value="ATS Realty">ATS Realty</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        <input type="text" id="customCompanyName" name="customCompanyName" placeholder="Enter Company Name"
+                            style="display:none; margin-top:8px;">
+                    </div>
+                    <div class="form-group">
+                        <label for="companyAddress">Company Address</label>
+                        <select name="companyAddress" id="companyAddress" required>
+                            <option value="">Select Company Address</option>
+                            <option value="Plot No. 16, Sector 135, Noida, 201301">Plot No. 16, Sector 135, Noida, 201301
+                            </option>
+                            <option value="711/92, Deepali, Nehru Place, New Delhi-110019">711/92, Deepali, Nehru Place, New
+                                Delhi-110019</option>
+                            <option value="ATS Tower, Plot No-16, Sector-135, Noida, Gautam Buddha Nagar, Uttar Pradesh, India">
+                                ATS Tower, Plot No-16, Sector-135, Noida, Gautam Buddha Nagar, Uttar Pradesh, India</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        <input type="text" id="customCompanyAddress" name="customCompanyAddress"
+                            placeholder="Enter Company Address" style="display:none; margin-top:8px;">
+                    </div>
+                </div>
+            </div>
+            <button type="submit">Generate Document</button>
+        </form>
+
+        <form id="docForm2" style="display:none;">
+            <h2>Fill Details - 2 Buyer, 2 Seller</h2>
+            <div class="form-section-columns">
+                <div class="form-column">
+                    <h3>Seller Details</h3>
+                    <!-- Seller 1 Details -->
+                    <div class="form-group">
+                        <label for="seller1Name2">Seller 1 Name</label>
+                        <input name="seller1Name" id="seller1Name2" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="seller1Pan2">Seller 1 PAN</label>
+                        <input name="seller1Pan" id="seller1Pan2" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="seller1Aadhar2">Seller 1 Aadhar</label>
+                        <input name="seller1Aadhar" id="seller1Aadhar2" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="seller1Relation2">Seller 1 Husband/Wife/Daughter Name</label>
+                        <input name="seller1Relation" id="seller1Relation2" required>
+                    </div>
+                    <hr/>
+                    <!-- Seller 2 Details -->
+                    <div class="form-group">
+                        <label for="seller2Name2">Seller 2 Name</label>
+                        <input name="seller2Name" id="seller2Name2" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="seller2Pan2">Seller 2 PAN</label>
+                        <input name="seller2Pan" id="seller2Pan2" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="seller2Aadhar2">Seller 2 Aadhar</label>
+                        <input name="seller2Aadhar" id="seller2Aadhar2" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="seller2Relation2">Seller 2 Husband/Wife/Daughter Name</label>
+                        <input name="seller2Relation" id="seller2Relation2" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="seller2Address2">Seller 2 Address</label>
+                        <input name="seller2Address" id="seller2Address2" required>
+                    </div>
+                </div>
+                <div class="form-column">
+                    <h3>Buyer Details</h3>
+                    <!-- Buyer 1 Details -->
+                    <div class="form-group">
+                        <label for="buyer1Name2">Buyer 1 Name</label>
+                        <input name="buyer1Name" id="buyer1Name2" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="buyer1Pan2">Buyer 1 PAN</label>
+                        <input name="buyer1Pan" id="buyer1Pan2" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="buyer1Aadhar2">Buyer 1 Aadhar</label>
+                        <input name="buyer1Aadhar" id="buyer1Aadhar2" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="buyer1Relation2">Buyer 1 Husband/Wife/Daughter Name</label>
+                        <input name="buyer1Relation" id="buyer1Relation2" required>
+                    </div>
+                    <hr/>
+                    <!-- Buyer 2 Details -->
+                    <div class="form-group">
+                        <label for="buyer2Name2">Buyer 2 Name</label>
+                        <input name="buyer2Name" id="buyer2Name2" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="buyer2Pan2">Buyer 2 PAN</label>
+                        <input name="buyer2Pan" id="buyer2Pan2" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="buyer2Aadhar2">Buyer 2 Aadhar</label>
+                        <input name="buyer2Aadhar" id="buyer2Aadhar2" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="buyer2Relation2">Buyer 2 Husband/Wife/Daughter Name</label>
+                        <input name="buyer2Relation" id="buyer2Relation2" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="buyer2Address2">Buyer 2 Address</label>
+                        <input name="buyer2Address" id="buyer2Address2" required>
+                    </div>
+                </div>
+            </div>
+
+            <div class="details-section">
+                <h3>Property Details</h3>
+                <div class="property-grid">
+                    <!-- Property Details -->
+                    <div class="form-group">
+                        <label for="flatNo2">Flat No</label>
+                        <input name="flatNo" id="flatNo2" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="unitNo2">Unit No</label>
+                        <input name="unitNo" id="unitNo2" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="unitType2">Unit Type</label>
+                        <input name="unitType" id="unitType2" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="floorNo2">Floor No</label>
+                        <input name="floorNo" id="floorNo2" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="towerNo2">Tower No</label>
+                        <input name="towerNo" id="towerNo2" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="propertyName2">Property Name</label>
+                        <select name="propertyName" id="propertyName2" required>
+                            <option value="">Select Property</option>
+                            <option value="ATS PICTURESQUE REPRIEVES PHASE 2">ATS PICTURESQUE REPRIEVES PHASE 2</option>
+                            <option value="ATS Greens">ATS Greens</option>
+                            <option value="ATS Advantage">ATS Advantage</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        <input type="text" id="customPropertyName2" name="customPropertyName" placeholder="Enter Property Name"
+                            style="display:none; margin-top:8px;">
+                    </div>
+                    <div class="form-group">
+                        <label for="propertyAddress2">Property Address</label>
+                        <select name="propertyAddress" id="propertyAddress2" required>
+                            <option value="">Select Address</option>
+                            <option value="Plot No. 16, Sector 135, Noida, 201301">Plot No. 16, Sector 135, Noida, 201301
+                            </option>
+                            <option value="Plot No. 17, Sector 150, Noida, 201310">Plot No. 17, Sector 150, Noida, 201310
+                            </option>
+                            <option value="Plot No. 18, Sector 93, Noida, 201304">Plot No. 18, Sector 93, Noida, 201304</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        <input type="text" id="customPropertyAddress2" name="customPropertyAddress"
+                            placeholder="Enter Property Address" style="display:none; margin-top:8px;">
+                    </div>
+                </div>
+            </div>
+
+            <div class="details-section">
+                <h3>Company Details</h3>
+                <div class="company-grid">
+                    <!-- Company Details -->
+                    <div class="form-group">
+                        <label for="companyName2">Company Name</label>
+                        <select name="companyName" id="companyName2" required>
+                            <option value="">Select Company</option>
+                            <option value="ATS Homes Private Limited">ATS Homes Private Limited</option>
+                            <option value="ATS Infrastructure Ltd">ATS Infrastructure Ltd</option>
+                            <option value="ATS Realty">ATS Realty</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        <input type="text" id="customCompanyName2" name="customCompanyName" placeholder="Enter Company Name"
+                            style="display:none; margin-top:8px;">
+                    </div>
+                    <div class="form-group">
+                        <label for="companyAddress2">Company Address</label>
+                        <select name="companyAddress" id="companyAddress2" required>
+                            <option value="">Select Company Address</option>
+                            <option value="Plot No. 16, Sector 135, Noida, 201301">Plot No. 16, Sector 135, Noida, 201301
+                            </option>
+                            <option value="711/92, Deepali, Nehru Place, New Delhi-110019">711/92, Deepali, Nehru Place, New
+                                Delhi-110019</option>
+                            <option value="ATS Tower, Plot No-16, Sector-135, Noida, Gautam Buddha Nagar, Uttar Pradesh, India">
+                                ATS Tower, Plot No-16, Sector-135, Noida, Gautam Buddha Nagar, Uttar Pradesh, India</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        <input type="text" id="customCompanyAddress2" name="customCompanyAddress"
+                            placeholder="Enter Company Address" style="display:none; margin-top:8px;">
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit">Generate Document</button>
+        </form>
+
+        <form id="docForm3" style="display:none;">
+            <h2>Fill Details - 1 Buyer, 2 Seller</h2>
+
+            <div class="form-section-columns">
+                <div class="form-column">
+                    <h3>Seller Details</h3>
+                    <!-- Seller 1 Details -->
+                    <div class="form-group">
+                        <label for="seller1Name3">Seller 1 Name</label>
+                        <input name="seller1Name" id="seller1Name3" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="seller1Pan3">Seller 1 PAN</label>
+                        <input name="seller1Pan" id="seller1Pan3" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="seller1Aadhar3">Seller 1 Aadhar</label>
+                        <input name="seller1Aadhar" id="seller1Aadhar3" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="seller1Relation3">Seller 1 Husband/Wife/Daughter Name</label>
+                        <input name="seller1Relation" id="seller1Relation3" required>
+                    </div>
+                    <hr/>
+                    <!-- Seller 2 Details -->
+                    <div class="form-group">
+                        <label for="seller2Name3">Seller 2 Name</label>
+                        <input name="seller2Name" id="seller2Name3" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="seller2Pan3">Seller 2 PAN</label>
+                        <input name="seller2Pan" id="seller2Pan3" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="seller2Aadhar3">Seller 2 Aadhar</label>
+                        <input name="seller2Aadhar" id="seller2Aadhar3" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="seller2Relation3">Seller 2 Husband/Wife/Daughter Name</label>
+                        <input name="seller2Relation" id="seller2Relation3" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="seller2Address3">Seller 2 Address</label>
+                        <input name="seller2Address" id="seller2Address3" required>
+                    </div>
+                </div>
+                <div class="form-column">
+                    <h3>Buyer Details</h3>
+                    <!-- Buyer 1 Details -->
+                    <div class="form-group">
+                        <label for="buyer1Name3">Buyer 1 Name</label>
+                        <input name="buyer1Name" id="buyer1Name3" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="buyer1Pan3">Buyer 1 PAN</label>
+                        <input name="buyer1Pan" id="buyer1Pan3" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="buyer1Aadhar3">Buyer 1 Aadhar</label>
+                        <input name="buyer1Aadhar" id="buyer1Aadhar3" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="buyer1Relation3">Buyer 1 Husband/Wife/Daughter Name</label>
+                        <input name="buyer1Relation" id="buyer1Relation3" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="buyer1Address3">Buyer 1 Address</label>
+                        <input name="buyer1Address" id="buyer1Address3" required>
+                    </div>
+                </div>
+            </div>
+
+            <div class="details-section">
+                <h3>Property Details</h3>
+                <div class="property-grid">
+                    <div class="form-group">
+                        <label for="flatNo3">Flat No</label>
+                        <input name="flatNo" id="flatNo3" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="unitNo3">Unit No</label>
+                        <input name="unitNo" id="unitNo3" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="unitSize3">Unit Size</label>
+                        <input name="unitSize" id="unitSize3" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="unitType3">Unit Type</label>
+                        <input name="unitType" id="unitType3" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="floorNo3">Floor No</label>
+                        <input name="floorNo" id="floorNo3" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="towerNo3">Tower No</label>
+                        <input name="towerNo" id="towerNo3" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="propertyName3">Property Name</label>
+                        <select name="propertyName" id="propertyName3" required>
+                            <option value="">Select Property</option>
+                            <option value="ATS PICTURESQUE REPRIEVES PHASE 2">ATS PICTURESQUE REPRIEVES PHASE 2</option>
+                            <option value="ATS Greens">ATS Greens</option>
+                            <option value="ATS Advantage">ATS Advantage</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        <input type="text" id="customPropertyName3" name="customPropertyName" placeholder="Enter Property Name"
+                            style="display:none; margin-top:8px;">
+                    </div>
+                    <div class="form-group">
+                        <label for="propertyAddress3">Property Address</label>
+                        <select name="propertyAddress" id="propertyAddress3" required>
+                            <option value="">Select Address</option>
+                            <option value="Plot No. 16, Sector 135, Noida, 201301">Plot No. 16, Sector 135, Noida, 201301
+                            </option>
+                            <option value="Plot No. 17, Sector 150, Noida, 201310">Plot No. 17, Sector 150, Noida, 201310
+                            </option>
+                            <option value="Plot No. 18, Sector 93, Noida, 201304">Plot No. 18, Sector 93, Noida, 201304</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        <input type="text" id="customPropertyAddress3" name="customPropertyAddress"
+                            placeholder="Enter Property Address" style="display:none; margin-top:8px;">
+                    </div>
+                </div>
+            </div>
+
+            <div class="details-section">
+                <h3>Company Details</h3>
+                <div class="company-grid">
+                    <div class="form-group">
+                        <label for="companyName3">Company Name</label>
+                        <select name="companyName" id="companyName3" required>
+                            <option value="">Select Company</option>
+                            <option value="ATS Homes Private Limited">ATS Homes Private Limited</option>
+                            <option value="ATS Infrastructure Ltd">ATS Infrastructure Ltd</option>
+                            <option value="ATS Realty">ATS Realty</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        <input type="text" id="customCompanyName3" name="customCompanyName" placeholder="Enter Company Name"
+                            style="display:none; margin-top:8px;">
+                    </div>
+                    <div class="form-group">
+                        <label for="companyAddress3">Company Address</label>
+                        <select name="companyAddress" id="companyAddress3" required>
+                            <option value="">Select Company Address</option>
+                            <option value="Plot No. 16, Sector 135, Noida, 201301">Plot No. 16, Sector 135, Noida, 201301
+                            </option>
+                            <option value="711/92, Deepali, Nehru Place, New Delhi-110019">711/92, Deepali, Nehru Place, New
+                                Delhi-110019</option>
+                            <option value="ATS Tower, Plot No-16, Sector-135, Noida, Gautam Buddha Nagar, Uttar Pradesh, India">
+                                ATS Tower, Plot No-16, Sector-135, Noida, Gautam Buddha Nagar, Uttar Pradesh, India</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        <input type="text" id="customCompanyAddress3" name="customCompanyAddress"
+                            placeholder="Enter Company Address" style="display:none; margin-top:8px;">
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit">Generate Document</button>
+        </form>
+
+        <form id="docForm4" style="display:none;">
+            <h2>Fill Details - 2 Buyer, 1 Seller</h2>
+
+            <div class="form-section-columns">
+                <div class="form-column">
+                    <h3>Seller Details</h3>
+                    <!-- Seller 1 Details -->
+                    <div class="form-group">
+                        <label for="seller1Name4">Seller 1 Name</label>
+                        <input name="seller1Name" id="seller1Name4" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="seller1Pan4">Seller 1 PAN</label>
+                        <input name="seller1Pan" id="seller1Pan4" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="seller1Aadhar4">Seller 1 Aadhar</label>
+                        <input name="seller1Aadhar" id="seller1Aadhar4" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="seller1Relation4">Seller 1 Husband/Wife/Daughter Name</label>
+                        <input name="seller1Relation" id="seller1Relation4" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="seller1Address4">Seller 1 Address</label>
+                        <input name="seller1Address" id="seller1Address4" required>
+                    </div>
+                </div>
+                <div class="form-column">
+                    <h3>Buyer Details</h3>
+                    <!-- Buyer 1 Details -->
+                    <div class="form-group">
+                        <label for="buyer1Name4">Buyer 1 Name</label>
+                        <input name="buyer1Name" id="buyer1Name4" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="buyer1Pan4">Buyer 1 PAN</label>
+                        <input name="buyer1Pan" id="buyer1Pan4" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="buyer1Aadhar4">Buyer 1 Aadhar</label>
+                        <input name="buyer1Aadhar" id="buyer1Aadhar4" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="buyer1Relation4">Buyer 1 Husband/Wife/Daughter Name</label>
+                        <input name="buyer1Relation" id="buyer1Relation4" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="buyer1Address4">Buyer 1 Address</label>
+                        <input name="buyer1Address" id="buyer1Address4" required>
+                    </div>
+                    <hr/>
+                    <!-- Buyer 2 Details -->
+                    <div class="form-group">
+                        <label for="buyer2Name4">Buyer 2 Name</label>
+                        <input name="buyer2Name" id="buyer2Name4" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="buyer2Pan4">Buyer 2 PAN</label>
+                        <input name="buyer2Pan" id="buyer2Pan4" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="buyer2Aadhar4">Buyer 2 Aadhar</label>
+                        <input name="buyer2Aadhar" id="buyer2Aadhar4" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="buyer2Relation4">Buyer 2 Husband/Wife/Daughter Name</label>
+                        <input name="buyer2Relation" id="buyer2Relation4" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="buyer2Address4">Buyer 2 Address</label>
+                        <input name="buyer2Address" id="buyer2Address4" required>
+                    </div>
+                </div>
+            </div>
+
+            <div class="details-section">
+                <h3>Property Details</h3>
+                <div class="property-grid">
+                    <div class="form-group">
+                        <label for="flatNo4">Flat No</label>
+                        <input name="flatNo" id="flatNo4" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="unitNo4">Unit No</label>
+                        <input name="unitNo" id="unitNo4" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="unitSize4">Unit Size</label>
+                        <input name="unitSize" id="unitSize4" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="unitType4">Unit Type</label>
+                        <input name="unitType" id="unitType4" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="floorNo4">Floor No</label>
+                        <input name="floorNo" id="floorNo4" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="towerNo4">Tower No</label>
+                        <input name="towerNo" id="towerNo4" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="propertyName4">Property Name</label>
+                        <select name="propertyName" id="propertyName4" required>
+                            <option value="">Select Property</option>
+                            <option value="ATS PICTURESQUE REPRIEVES PHASE 2">ATS PICTURESQUE REPRIEVES PHASE 2</option>
+                            <option value="ATS Greens">ATS Greens</option>
+                            <option value="ATS Advantage">ATS Advantage</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        <input type="text" id="customPropertyName4" name="customPropertyName" placeholder="Enter Property Name"
+                            style="display:none; margin-top:8px;">
+                    </div>
+                    <div class="form-group">
+                        <label for="propertyAddress4">Property Address</label>
+                        <select name="propertyAddress" id="propertyAddress4" required>
+                            <option value="">Select Address</option>
+                            <option value="Plot No. 16, Sector 135, Noida, 201301">Plot No. 16, Sector 135, Noida, 201301
+                            </option>
+                            <option value="Plot No. 17, Sector 150, Noida, 201310">Plot No. 17, Sector 150, Noida, 201310
+                            </option>
+                            <option value="Plot No. 18, Sector 93, Noida, 201304">Plot No. 18, Sector 93, Noida, 201304</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        <input type="text" id="customPropertyAddress4" name="customPropertyAddress"
+                            placeholder="Enter Property Address" style="display:none; margin-top:8px;">
+                    </div>
+                </div>
+            </div>
+
+            <div class="details-section">
+                <h3>Company Details</h3>
+                <div class="company-grid">
+                    <div class="form-group">
+                        <label for="companyName4">Company Name</label>
+                        <select name="companyName" id="companyName4" required>
+                            <option value="">Select Company</option>
+                            <option value="ATS Homes Private Limited">ATS Homes Private Limited</option>
+                            <option value="ATS Infrastructure Ltd">ATS Infrastructure Ltd</option>
+                            <option value="ATS Realty">ATS Realty</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        <input type="text" id="customCompanyName4" name="customCompanyName" placeholder="Enter Company Name"
+                            style="display:none; margin-top:8px;">
+                    </div>
+                    <div class="form-group">
+                        <label for="companyAddress4">Company Address</label>
+                        <select name="companyAddress" id="companyAddress4" required>
+                            <option value="">Select Company Address</option>
+                            <option value="Plot No. 16, Sector 135, Noida, 201301">Plot No. 16, Sector 135, Noida, 201301
+                            </option>
+                            <option value="711/92, Deepali, Nehru Place, New Delhi-110019">711/92, Deepali, Nehru Place, New
+                                Delhi-110019</option>
+                            <option value="ATS Tower, Plot No-16, Sector-135, Noida, Gautam Buddha Nagar, Uttar Pradesh, India">
+                                ATS Tower, Plot No-16, Sector-135, Noida, Gautam Buddha Nagar, Uttar Pradesh, India</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        <input type="text" id="customCompanyAddress4" name="customCompanyAddress"
+                            placeholder="Enter Company Address" style="display:none; margin-top:8px;">
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit">Generate Document</button>
+        </form>
+    </div>
+    <script>
+        document.getElementById('optionCard').onclick = function () {
+            this.style.display = 'none';
+            document.getElementById('docForm').style.display = 'flex';
+        };
+        document.getElementById('docForm').onsubmit = async function (e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+
+            // Property Name
+            if (formData.get('propertyName') === 'Other') {
+                formData.set('propertyName', document.getElementById('customPropertyName').value);
+            }
+            // Property Address
+            if (formData.get('propertyAddress') === 'Other') {
+                formData.set('propertyAddress', document.getElementById('customPropertyAddress').value);
+            }
+            // Company Name
+            if (formData.get('companyName') === 'Other') {
+                formData.set('companyName', document.getElementById('customCompanyName').value);
+            }
+            // Company Address
+            if (formData.get('companyAddress') === 'Other') {
+                formData.set('companyAddress', document.getElementById('customCompanyAddress').value);
+            }
+
+            const response = await fetch('/generate', {
+                method: 'POST',
+                body: new URLSearchParams([...formData])
+            });
+            if (response.ok) {
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'customized.docx';
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                window.URL.revokeObjectURL(url);
+            } else {
+                alert('Error generating document');
+            }
+        };
+
+        document.getElementById('optionCard2').onclick = function () {
+            this.style.display = 'none';
+            document.getElementById('docForm2').style.display = 'flex';
+        };
+        document.getElementById('docForm2').onsubmit = async function (e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+
+            // Property Name
+            if (formData.get('propertyName') === 'Other') {
+                formData.set('propertyName', document.getElementById('customPropertyName2').value);
+            }
+            // Property Address
+            if (formData.get('propertyAddress') === 'Other') {
+                formData.set('propertyAddress', document.getElementById('customPropertyAddress2').value);
+            }
+            // Company Name
+            if (formData.get('companyName') === 'Other') {
+                formData.set('companyName', document.getElementById('customCompanyName2').value);
+            }
+            // Company Address
+            if (formData.get('companyAddress') === 'Other') {
+                formData.set('companyAddress', document.getElementById('customCompanyAddress2').value);
+            }
+
+            const response = await fetch('/generate2', {
+                method: 'POST',
+                body: new URLSearchParams([...formData])
+            });
+            if (response.ok) {
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'customized.docx';
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                window.URL.revokeObjectURL(url);
+            } else {
+                alert('Error generating document');
+            }
+        };
+
+        document.getElementById('optionCard3').onclick = function () {
+            this.style.display = 'none';
+            document.getElementById('docForm3').style.display = 'flex';
+        };
+        document.getElementById('docForm3').onsubmit = async function (e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+
+            // Property Name
+            if (formData.get('propertyName') === 'Other') {
+                formData.set('propertyName', document.getElementById('customPropertyName3').value);
+            }
+            // Property Address
+            if (formData.get('propertyAddress') === 'Other') {
+                formData.set('propertyAddress', document.getElementById('customPropertyAddress3').value);
+            }
+            // Company Name
+            if (formData.get('companyName') === 'Other') {
+                formData.set('companyName', document.getElementById('customCompanyName3').value);
+            }
+            // Company Address
+            if (formData.get('companyAddress') === 'Other') {
+                formData.set('companyAddress', document.getElementById('customCompanyAddress3').value);
+            }
+
+            const response = await fetch('/generate3', {
+                method: 'POST',
+                body: new URLSearchParams([...formData])
+            });
+            if (response.ok) {
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'customized.docx';
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                window.URL.revokeObjectURL(url);
+            } else {
+                alert('Error generating document');
+            }
+        };
+
+        document.getElementById('optionCard4').onclick = function () {
+            this.style.display = 'none';
+            document.getElementById('docForm4').style.display = 'flex';
+        };
+        document.getElementById('docForm4').onsubmit = async function (e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+
+            // Property Name
+            if (formData.get('propertyName') === 'Other') {
+                formData.set('propertyName', document.getElementById('customPropertyName4').value);
+            }
+            // Property Address
+            if (formData.get('propertyAddress') === 'Other') {
+                formData.set('propertyAddress', document.getElementById('customPropertyAddress4').value);
+            }
+            // Company Name
+            if (formData.get('companyName') === 'Other') {
+                formData.set('companyName', document.getElementById('customCompanyName4').value);
+            }
+            // Company Address
+            if (formData.get('companyAddress') === 'Other') {
+                formData.set('companyAddress', document.getElementById('customCompanyAddress4').value);
+            }
+
+            const response = await fetch('/generate4', {
+                method: 'POST',
+                body: new URLSearchParams([...formData])
+            });
+            if (response.ok) {
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'customized.docx';
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                window.URL.revokeObjectURL(url);
+            } else {
+                alert('Error generating document');
+            }
+        };
+
+        // --- Aadhar Formatting and Validation ---
+        function formatAadhar(input) {
+            let value = input.value.replace(/\D/g, '');
+            value = value.substring(0, 12);
+            let formatted = '';
+            for (let i = 0; i < value.length; i++) {
+                if (i > 0 && i % 4 === 0) formatted += ' ';
+                formatted += value[i];
+            }
+            input.value = formatted;
+        }
+        function validateAadhar(input) {
+            let value = input.value.replace(/\s/g, '');
+            if (value.length === 12) {
+                input.style.borderColor = '#00c853';
+            } else {
+                input.style.borderColor = '#ff1744';
+            }
+        }
+        // --- PAN Formatting and Validation ---
+        function formatPAN(input) {
+            input.value = input.value.toUpperCase().replace(/[^A-Z0-9]/g, '').substring(0, 10);
+        }
+        function validatePAN(input) {
+            const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
+            const errorId = input.id + '-error';
+            let errorEl = document.getElementById(errorId);
+            if (!errorEl) {
+                errorEl = document.createElement('div');
+                errorEl.id = errorId;
+                errorEl.style.color = '#ff1744';
+                errorEl.style.fontSize = '0.9em';
+                errorEl.style.marginTop = '2px';
+                input.parentNode.appendChild(errorEl);
+            }
+            if (panRegex.test(input.value)) {
+                input.style.borderColor = '#00c853';
+                errorEl.textContent = '';
+            } else {
+                input.style.borderColor = '#ff1744';
+                errorEl.textContent = 'PAN format: 5 capital letters, 4 digits, 1 capital letter (e.g. ABCDE1234J)';
+            }
+        }
+        // Attach events after DOM loaded
+        document.addEventListener('DOMContentLoaded', function () {
+            // Aadhar fields for both forms
+            const aadharFields = [
+                'seller1Aadhar', 'buyer1Aadhar',
+                'seller1Aadhar2', 'buyer1Aadhar2', 'seller2Aadhar2', 'buyer2Aadhar2',
+                'seller1Aadhar3', 'buyer1Aadhar3', 'seller2Aadhar3',
+                'seller1Aadhar4', 'buyer1Aadhar4', 'buyer2Aadhar4'
+            ];
+            aadharFields.forEach(function (id) {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.addEventListener('input', function (e) {
+                        formatAadhar(this);
+                        validateAadhar(this);
+                    });
+                    el.addEventListener('keypress', function (e) {
+                        if (!/\d/.test(e.key)) e.preventDefault();
+                    });
+                }
+            });
+
+            // PAN fields for both forms
+            const panFields = [
+                'seller1Pan', 'buyer1Pan',
+                'seller1Pan2', 'buyer1Pan2', 'seller2Pan2', 'buyer2Pan2',
+                'seller1Pan3', 'buyer1Pan3', 'seller2Pan3',
+                'seller1Pan4', 'buyer1Pan4', 'buyer2Pan4'
+            ];
+            panFields.forEach(function (id) {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.addEventListener('input', function (e) {
+                        formatPAN(this);
+                        validatePAN(this);
+                    });
+                    el.addEventListener('keypress', function (e) {
+                        if (!/[a-zA-Z0-9]/.test(e.key) || this.value.length >= 10) e.preventDefault();
+                    });
+                }
+            });
+
+            // Name fields (only alphabets) for both forms
+            const nameFields = [
+                'seller1Name', 'buyer1Name', 'seller1Relation', 'buyer1Relation',
+                'seller1Name2', 'buyer1Name2', 'seller1Relation2', 'buyer1Relation2',
+                'seller2Name2', 'buyer2Name2', 'seller2Relation2', 'buyer2Relation2',
+                'seller1Name3', 'buyer1Name3', 'seller1Relation3', 'buyer1Relation3',
+                'seller2Name3', 'buyer2Name3', 'seller2Relation3', 'buyer2Relation3',
+                'seller1Name4', 'buyer1Name4', 'buyer2Name4', 'seller1Relation4', 'buyer1Relation4', 'buyer2Relation4'
+            ];
+            nameFields.forEach(function (id) {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.addEventListener('input', function () {
+                        // Check if it's a relation field (contains 'Relation' in the ID)
+                        if (this.id.includes('Relation')) {
+                            // Allow alphabets, spaces, and forward slash for relation fields
+                            this.value = this.value.replace(/[^a-zA-Z\s\/]/g, '');
+                        } else {
+                            // Only alphabets and spaces for name fields
+                            this.value = this.value.replace(/[^a-zA-Z\s]/g, '');
+                        }
+                    });
+                }
+            });
+
+            // Natural number fields for both forms
+            const naturalNumberFields = [
+                'flatNo', 'unitNo', 'floorNo',
+                'flatNo2', 'unitNo2', 'floorNo2',
+                'flatNo3', 'unitNo3', 'floorNo3',
+                'flatNo4', 'unitNo4', 'floorNo4'
+            ];
+            naturalNumberFields.forEach(function (id) {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.addEventListener('input', function () {
+                        this.value = this.value.replace(/[^0-9]/g, '');
+                        if (this.value.length > 1) this.value = this.value.replace(/^0+/, '');
+                    });
+                }
+            });
+
+            // Unit Type fields (only capital alphabets) for both forms
+            const unitTypeFields = ['unitType', 'unitType2', 'unitType3', 'unitType4'];
+            unitTypeFields.forEach(function (id) {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.addEventListener('input', function () {
+                        this.value = this.value.replace(/[^A-Z]/g, '');
+                    });
+                }
+            });
+
+            // Unit Size field (float allowed) for form 1
+            const unitSize = document.getElementById('unitSize');
+            if (unitSize) {
+                unitSize.addEventListener('input', function () {
+                    this.value = this.value.replace(/[^0-9.]/g, '');
+                    const parts = this.value.split('.');
+                    if (parts.length > 2) {
+                        this.value = parts[0] + '.' + parts.slice(1).join('');
+                    }
+                    if (/^0[0-9]/.test(this.value)) {
+                        this.value = this.value.replace(/^0+/, '');
+                    }
+                });
+            }
+
+            // Property Name dropdowns for both forms
+            document.getElementById('propertyName').addEventListener('change', function () {
+                document.getElementById('customPropertyName').style.display = this.value === 'Other' ? 'block' : 'none';
+                if (this.value !== 'Other') document.getElementById('customPropertyName').value = '';
+            });
+            document.getElementById('propertyName2').addEventListener('change', function () {
+                document.getElementById('customPropertyName2').style.display = this.value === 'Other' ? 'block' : 'none';
+                if (this.value !== 'Other') document.getElementById('customPropertyName2').value = '';
+            });
+            document.getElementById('propertyName3').addEventListener('change', function () {
+                document.getElementById('customPropertyName3').style.display = this.value === 'Other' ? 'block' : 'none';
+                if (this.value !== 'Other') document.getElementById('customPropertyName3').value = '';
+            });
+
+            document.getElementById('propertyName4').addEventListener('change', function () {
+                document.getElementById('customPropertyName4').style.display = this.value === 'Other' ? 'block' : 'none';
+                if (this.value !== 'Other') document.getElementById('customPropertyName4').value = '';
+            });
+
+            // Property Address dropdowns for both forms
+            document.getElementById('propertyAddress').addEventListener('change', function () {
+                document.getElementById('customPropertyAddress').style.display = this.value === 'Other' ? 'block' : 'none';
+                if (this.value !== 'Other') document.getElementById('customPropertyAddress').value = '';
+            });
+            document.getElementById('propertyAddress2').addEventListener('change', function () {
+                document.getElementById('customPropertyAddress2').style.display = this.value === 'Other' ? 'block' : 'none';
+                if (this.value !== 'Other') document.getElementById('customPropertyAddress2').value = '';
+            });
+            document.getElementById('propertyAddress3').addEventListener('change', function () {
+                document.getElementById('customPropertyAddress3').style.display = this.value === 'Other' ? 'block' : 'none';
+                if (this.value !== 'Other') document.getElementById('customPropertyAddress3').value = '';
+            });
+
+            document.getElementById('propertyAddress4').addEventListener('change', function () {
+                document.getElementById('customPropertyAddress4').style.display = this.value === 'Other' ? 'block' : 'none';
+                if (this.value !== 'Other') document.getElementById('customPropertyAddress4').value = '';
+            });
+
+            // Company Name dropdowns for form 1
+            document.getElementById('companyName').addEventListener('change', function () {
+                document.getElementById('customCompanyName').style.display = this.value === 'Other' ? 'block' : 'none';
+                if (this.value !== 'Other') document.getElementById('customCompanyName').value = '';
+            });
+
+            // Company Address dropdowns for form 1
+            document.getElementById('companyAddress').addEventListener('change', function () {
+                document.getElementById('customCompanyAddress').style.display = this.value === 'Other' ? 'block' : 'none';
+                if (this.value !== 'Other') document.getElementById('customCompanyAddress').value = '';
+            });
+
+            // Company Name dropdowns for form 2
+            document.getElementById('companyName2').addEventListener('change', function () {
+                document.getElementById('customCompanyName2').style.display = this.value === 'Other' ? 'block' : 'none';
+                if (this.value !== 'Other') document.getElementById('customCompanyName2').value = '';
+            });
+
+            // Company Address dropdowns for form 2
+            document.getElementById('companyAddress2').addEventListener('change', function () {
+                document.getElementById('customCompanyAddress2').style.display = this.value === 'Other' ? 'block' : 'none';
+                if (this.value !== 'Other') document.getElementById('customCompanyAddress2').value = '';
+            });
+
+            // Company Name dropdowns for form 3
+            document.getElementById('companyName3').addEventListener('change', function () {
+                document.getElementById('customCompanyName3').style.display = this.value === 'Other' ? 'block' : 'none';
+                if (this.value !== 'Other') document.getElementById('customCompanyName3').value = '';
+            });
+
+            // Company Address dropdowns for form 3
+            document.getElementById('companyAddress3').addEventListener('change', function () {
+                document.getElementById('customCompanyAddress3').style.display = this.value === 'Other' ? 'block' : 'none';
+                if (this.value !== 'Other') document.getElementById('customCompanyAddress3').value = '';
+            });
+
+            // Unit Size field (float allowed) for form 3
+            const unitSize3 = document.getElementById('unitSize3');
+            if (unitSize3) {
+                unitSize3.addEventListener('input', function () {
+                    this.value = this.value.replace(/[^0-9.]/g, '');
+                    const parts = this.value.split('.');
+                    if (parts.length > 2) {
+                        this.value = parts[0] + '.' + parts.slice(1).join('');
+                    }
+                    if (/^0[0-9]/.test(this.value)) {
+                        this.value = this.value.replace(/^0+/, '');
+                    }
+                });
+            }
+
+            // Unit Size field (float allowed) for form 4
+            const unitSize4 = document.getElementById('unitSize4');
+            if (unitSize4) {
+                unitSize4.addEventListener('input', function () {
+                    this.value = this.value.replace(/[^0-9.]/g, '');
+                    const parts = this.value.split('.');
+                    if (parts.length > 2) {
+                        this.value = parts[0] + '.' + parts.slice(1).join('');
+                    }
+                    if (/^0[0-9]/.test(this.value)) {
+                        this.value = this.value.replace(/^0+/, '');
+                    }
+                });
+            }
+
+            // Company Address dropdowns for form 3
+            document.getElementById('companyAddress3').addEventListener('change', function () {
+                document.getElementById('customCompanyAddress3').style.display = this.value === 'Other' ? 'block' : 'none';
+                if (this.value !== 'Other') document.getElementById('customCompanyAddress3').value = '';
+            });
+
+            // Company Name dropdowns for form 4
+            document.getElementById('companyName4').addEventListener('change', function () {
+                document.getElementById('customCompanyName4').style.display = this.value === 'Other' ? 'block' : 'none';
+                if (this.value !== 'Other') document.getElementById('customCompanyName4').value = '';
+            });
+
+            // Company Address dropdowns for form 4
+            document.getElementById('companyAddress4').addEventListener('change', function () {
+                document.getElementById('customCompanyAddress4').style.display = this.value === 'Other' ? 'block' : 'none';
+                if (this.value !== 'Other') document.getElementById('customCompanyAddress4').value = '';
+            });
+        });
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const forms = ['docForm', 'docForm2', 'docForm3', 'docForm4'];
+            const options = ['optionCard', 'optionCard2', 'optionCard3', 'optionCard4'];
+            const mainSection = document.getElementById('main');
+
+            function showForm(formId) {
+                // Hide all cards
+                options.forEach(opt => {
+                    const card = document.getElementById(opt);
+                    if (card) card.style.display = 'none';
+                });
+
+                // Show the selected form
+                forms.forEach(f => {
+                    const form = document.getElementById(f);
+                    if (form) form.style.display = f === formId ? 'flex' : 'none';
+                });
+
+                // Add back button
+                if (!document.getElementById('backBtn')) {
+                    const backBtn = document.createElement('button');
+                    backBtn.id = 'backBtn';
+                    backBtn.innerText = '← Back to Options';
+                    backBtn.style.cssText = `
+                margin: 2rem auto 1rem auto;
+                display: block;
+                background: #444;
+                color: #fff;
+                padding: 0.8rem 1.5rem;
+                border-radius: 10px;
+                border: none;
+                font-size: 1rem;
+                cursor: pointer;
+                box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+            `;
+                    backBtn.onclick = () => {
+                        forms.forEach(f => {
+                            const form = document.getElementById(f);
+                            if (form) form.style.display = 'none';
+                        });
+                        options.forEach(opt => {
+                            const card = document.getElementById(opt);
+                            if (card) card.style.display = 'flex';
+                        });
+                        backBtn.remove();
+                    };
+                    mainSection.prepend(backBtn);
+                }
+            }
+
+            // Set click listeners for option cards
+            document.getElementById('optionCard').addEventListener('click', () => showForm('docForm'));
+            document.getElementById('optionCard2').addEventListener('click', () => showForm('docForm2'));
+            document.getElementById('optionCard3').addEventListener('click', () => showForm('docForm3'));
+            document.getElementById('optionCard4').addEventListener('click', () => showForm('docForm4'));
+        });
+
+
+    </script>
+</body>
+
+</html>
