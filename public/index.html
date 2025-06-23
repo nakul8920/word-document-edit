@@ -685,6 +685,7 @@
                     0 0 30px rgba(255, 255, 255, 0.4),
                     0 0 40px rgba(255, 255, 255, 0.3);
             }
+
             to {
                 text-shadow: 0 0 30px rgba(255, 255, 255, 0.8),
                     0 0 40px rgba(255, 255, 255, 0.6),
@@ -817,7 +818,8 @@
             flex-direction: column;
         }
 
-        .form-column h3, .details-section h3 {
+        .form-column h3,
+        .details-section h3 {
             font-size: 1.5rem;
             color: #ff5858;
             margin-bottom: 1rem;
@@ -837,9 +839,14 @@
         }
 
         @media (max-width: 1200px) {
-            #docForm, #docForm2, #docForm3, #docForm4 {
+
+            #docForm,
+            #docForm2,
+            #docForm3,
+            #docForm4 {
                 max-width: 95%;
             }
+
             .form-section-columns {
                 flex-direction: column;
                 gap: 1rem;
@@ -1369,13 +1376,16 @@
                 grid-template-columns: 1fr;
                 gap: 1.5rem;
             }
+
             .option-card {
                 min-width: 90vw;
                 max-width: 98vw;
             }
+
             .main-title {
                 font-size: 2.8rem;
             }
+
             .main-description {
                 font-size: 1.1rem;
             }
@@ -1386,22 +1396,27 @@
                 font-size: 2.2rem;
                 letter-spacing: 1px;
             }
+
             .main-description {
                 font-size: 1rem;
             }
+
             .hero-header {
                 margin-bottom: 2rem;
             }
+
             .option-card {
                 min-width: 90vw;
                 max-width: 98vw;
                 padding: 1.5rem 1rem;
             }
+
             .option-avatar {
                 width: 60px;
                 height: 60px;
                 font-size: 2rem;
             }
+
             .option-title {
                 font-size: 1.4rem;
             }
@@ -1411,9 +1426,11 @@
             .main-title {
                 font-size: 1.8rem;
             }
+
             .main-description {
                 font-size: 0.9rem;
             }
+
             #main {
                 padding: 1rem 0.5rem;
             }
@@ -1425,9 +1442,10 @@
     <div id="main">
         <div class="hero-header">
             <h1 class="main-title">Word Document Editor</h1>
-            <p class="main-description">Create professional property documents with ease. Choose your template and fill in the details to generate customized Word documents instantly.</p>
+            <p class="main-description">Create professional property documents with ease. Choose your template and fill
+                in the details to generate customized Word documents instantly.</p>
         </div>
-        
+
         <div class="options-grid">
             <div class="option-card" id="optionCard">
                 <div class="option-avatar">
@@ -1544,22 +1562,30 @@
                         <select name="propertyName" id="propertyName" required>
                             <option value="">Select Property</option>
                             <option value="ATS PICTURESQUE REPRIEVES PHASE 2">ATS PICTURESQUE REPRIEVES PHASE 2</option>
-                            <option value="ATS Greens">ATS Greens</option>
-                            <option value="ATS Advantage">ATS Advantage</option>
+                            <option value="ATS PICTURESQUE REPRIEVES PHASE 1">ATS PICTURESQUE REPRIEVES PHASE 1</option>
+                            <option value="ATS DESTINAIRE">ATS DESTINAIRE</option>
+                            <option value="ATS RHAPSODY">ATS RHAPSODY</option>
+                            <option value="ATS LE GRANDIOSE">ATS LE GRANDIOSE</option>
+                            <option value="ATS PIOUS HIDEAWAYS">ATS PIOUS HIDEAWAYS</option>
+                            <option value="ATS ALLURE">ATS ALLURE</option>
                             <option value="Other">Other</option>
                         </select>
-                        <input type="text" id="customPropertyName" name="customPropertyName" placeholder="Enter Property Name"
-                            style="display:none; margin-top:8px;">
+                        <input type="text" id="customPropertyName" name="customPropertyName"
+                            placeholder="Enter Property Name" style="display:none; margin-top:8px;">
                     </div>
                     <div class="form-group">
                         <label for="propertyAddress">Property Address</label>
                         <select name="propertyAddress" id="propertyAddress" required>
                             <option value="">Select Address</option>
-                            <option value="Plot No. 16, Sector 135, Noida, 201301">Plot No. 16, Sector 135, Noida, 201301
+                            <option value="SECTOR-152, NOIDA, DISTRICT- GAUTAM BUDDHA NAGAR, UTTAR PRADESH, 201301">
+                                SECTOR-152, NOIDA, DISTRICT- GAUTAM BUDDHA NAGAR, UTTAR PRADESH, 201301
                             </option>
-                            <option value="Plot No. 17, Sector 150, Noida, 201310">Plot No. 17, Sector 150, Noida, 201310
+                            <option value="SECTOR-1, GREATER NOIDA WEST">SECTOR-1, GREATER NOIDA WEST
                             </option>
-                            <option value="Plot No. 18, Sector 93, Noida, 201304">Plot No. 18, Sector 93, Noida, 201304</option>
+                            <option
+                                value="PLOT NO. GH-12/01, SECTOR-1, GREATER NOIDA, DISTRICT GAUTAM BUDDHA NAGAR, UTTAR PRADESH, INDIA">
+                                PLOT NO. GH-12/01, SECTOR-1, GREATER NOIDA, DISTRICT GAUTAM BUDDHA NAGAR, UTTAR PRADESH,
+                                INDIA</option>
                             <option value="Other">Other</option>
                         </select>
                         <input type="text" id="customPropertyAddress" name="customPropertyAddress"
@@ -1575,24 +1601,23 @@
                         <label for="companyName">Company Name</label>
                         <select name="companyName" id="companyName" required>
                             <option value="">Select Company</option>
-                            <option value="ATS Homes Private Limited">ATS Homes Private Limited</option>
-                            <option value="ATS Infrastructure Ltd">ATS Infrastructure Ltd</option>
-                            <option value="ATS Realty">ATS Realty</option>
+                            <option value="ATS HOMES PRIVATE LIMITED">ATS HOMES PRIVATE LIMITED</option>
+                            <option value="ATS GRAND REALTORS PRIVATE LIMITED">ATS GRAND REALTORS PRIVATE LIMITED
+                            </option>
                             <option value="Other">Other</option>
                         </select>
-                        <input type="text" id="customCompanyName" name="customCompanyName" placeholder="Enter Company Name"
-                            style="display:none; margin-top:8px;">
+                        <input type="text" id="customCompanyName" name="customCompanyName"
+                            placeholder="Enter Company Name" style="display:none; margin-top:8px;">
                     </div>
                     <div class="form-group">
                         <label for="companyAddress">Company Address</label>
                         <select name="companyAddress" id="companyAddress" required>
                             <option value="">Select Company Address</option>
-                            <option value="Plot No. 16, Sector 135, Noida, 201301">Plot No. 16, Sector 135, Noida, 201301
+                            <option value="711/92, DEEPALI, NEHRU PLACE, NEW DELHI-110019.">711/92, DEEPALI, NEHRU
+                                PLACE, NEW DELHI-110019.
                             </option>
-                            <option value="711/92, Deepali, Nehru Place, New Delhi-110019">711/92, Deepali, Nehru Place, New
-                                Delhi-110019</option>
-                            <option value="ATS Tower, Plot No-16, Sector-135, Noida, Gautam Buddha Nagar, Uttar Pradesh, India">
-                                ATS Tower, Plot No-16, Sector-135, Noida, Gautam Buddha Nagar, Uttar Pradesh, India</option>
+                            <option value="PLOT NO. 16, SECTOR 135, NOIDA, 201301">PLOT NO. 16, SECTOR 135, NOIDA,
+                                201301</option>
                             <option value="Other">Other</option>
                         </select>
                         <input type="text" id="customCompanyAddress" name="customCompanyAddress"
@@ -1625,7 +1650,7 @@
                         <label for="seller1Relation2">Seller 1 Husband/Wife/Daughter Name</label>
                         <input name="seller1Relation" id="seller1Relation2" required>
                     </div>
-                    <hr/>
+                    <hr />
                     <!-- Seller 2 Details -->
                     <div class="form-group">
                         <label for="seller2Name2">Seller 2 Name</label>
@@ -1667,7 +1692,7 @@
                         <label for="buyer1Relation2">Buyer 1 Husband/Wife/Daughter Name</label>
                         <input name="buyer1Relation" id="buyer1Relation2" required>
                     </div>
-                    <hr/>
+                    <hr />
                     <!-- Buyer 2 Details -->
                     <div class="form-group">
                         <label for="buyer2Name2">Buyer 2 Name</label>
@@ -1705,7 +1730,7 @@
                         <input name="unitNo" id="unitNo2" required>
                     </div>
                     <div class="form-group">
-                        <label for="unitType2">Unit Type</label>
+                        <label for="unitType2">Unit Type(Enter capital alphabet only)</label>
                         <input name="unitType" id="unitType2" required>
                     </div>
                     <div class="form-group">
@@ -1721,22 +1746,30 @@
                         <select name="propertyName" id="propertyName2" required>
                             <option value="">Select Property</option>
                             <option value="ATS PICTURESQUE REPRIEVES PHASE 2">ATS PICTURESQUE REPRIEVES PHASE 2</option>
-                            <option value="ATS Greens">ATS Greens</option>
-                            <option value="ATS Advantage">ATS Advantage</option>
+                            <option value="ATS PICTURESQUE REPRIEVES PHASE 1">ATS PICTURESQUE REPRIEVES PHASE 1</option>
+                            <option value="ATS DESTINAIRE">ATS DESTINAIRE</option>
+                            <option value="ATS RHAPSODY">ATS RHAPSODY</option>
+                            <option value="ATS LE GRANDIOSE">ATS LE GRANDIOSE</option>
+                            <option value="ATS PIOUS HIDEAWAYS">ATS PIOUS HIDEAWAYS</option>
+                            <option value="ATS ALLURE">ATS ALLURE</option>
                             <option value="Other">Other</option>
                         </select>
-                        <input type="text" id="customPropertyName2" name="customPropertyName" placeholder="Enter Property Name"
-                            style="display:none; margin-top:8px;">
+                        <input type="text" id="customPropertyName2" name="customPropertyName"
+                            placeholder="Enter Property Name" style="display:none; margin-top:8px;">
                     </div>
                     <div class="form-group">
                         <label for="propertyAddress2">Property Address</label>
                         <select name="propertyAddress" id="propertyAddress2" required>
                             <option value="">Select Address</option>
-                            <option value="Plot No. 16, Sector 135, Noida, 201301">Plot No. 16, Sector 135, Noida, 201301
+                            <option value="SECTOR-152, NOIDA, DISTRICT- GAUTAM BUDDHA NAGAR, UTTAR PRADESH, 201301">
+                                SECTOR-152, NOIDA, DISTRICT- GAUTAM BUDDHA NAGAR, UTTAR PRADESH, 201301
                             </option>
-                            <option value="Plot No. 17, Sector 150, Noida, 201310">Plot No. 17, Sector 150, Noida, 201310
+                            <option value="SECTOR-1, GREATER NOIDA WEST">SECTOR-1, GREATER NOIDA WEST
                             </option>
-                            <option value="Plot No. 18, Sector 93, Noida, 201304">Plot No. 18, Sector 93, Noida, 201304</option>
+                            <option
+                                value="PLOT NO. GH-12/01, SECTOR-1, GREATER NOIDA, DISTRICT GAUTAM BUDDHA NAGAR, UTTAR PRADESH, INDIA">
+                                PLOT NO. GH-12/01, SECTOR-1, GREATER NOIDA, DISTRICT GAUTAM BUDDHA NAGAR, UTTAR PRADESH,
+                                INDIA</option>
                             <option value="Other">Other</option>
                         </select>
                         <input type="text" id="customPropertyAddress2" name="customPropertyAddress"
@@ -1753,24 +1786,23 @@
                         <label for="companyName2">Company Name</label>
                         <select name="companyName" id="companyName2" required>
                             <option value="">Select Company</option>
-                            <option value="ATS Homes Private Limited">ATS Homes Private Limited</option>
-                            <option value="ATS Infrastructure Ltd">ATS Infrastructure Ltd</option>
-                            <option value="ATS Realty">ATS Realty</option>
+                            <option value="ATS HOMES PRIVATE LIMITED">ATS HOMES PRIVATE LIMITED</option>
+                            <option value="ATS GRAND REALTORS PRIVATE LIMITED">ATS GRAND REALTORS PRIVATE LIMITED
+                            </option>
                             <option value="Other">Other</option>
                         </select>
-                        <input type="text" id="customCompanyName2" name="customCompanyName" placeholder="Enter Company Name"
-                            style="display:none; margin-top:8px;">
+                        <input type="text" id="customCompanyName2" name="customCompanyName"
+                            placeholder="Enter Company Name" style="display:none; margin-top:8px;">
                     </div>
                     <div class="form-group">
                         <label for="companyAddress2">Company Address</label>
                         <select name="companyAddress" id="companyAddress2" required>
                             <option value="">Select Company Address</option>
-                            <option value="Plot No. 16, Sector 135, Noida, 201301">Plot No. 16, Sector 135, Noida, 201301
+                            <option value="711/92, DEEPALI, NEHRU PLACE, NEW DELHI-110019.">711/92, DEEPALI, NEHRU
+                                PLACE, NEW DELHI-110019.
                             </option>
-                            <option value="711/92, Deepali, Nehru Place, New Delhi-110019">711/92, Deepali, Nehru Place, New
-                                Delhi-110019</option>
-                            <option value="ATS Tower, Plot No-16, Sector-135, Noida, Gautam Buddha Nagar, Uttar Pradesh, India">
-                                ATS Tower, Plot No-16, Sector-135, Noida, Gautam Buddha Nagar, Uttar Pradesh, India</option>
+                            <option value="PLOT NO. 16, SECTOR 135, NOIDA, 201301">PLOT NO. 16, SECTOR 135, NOIDA,
+                                201301</option>
                             <option value="Other">Other</option>
                         </select>
                         <input type="text" id="customCompanyAddress2" name="customCompanyAddress"
@@ -1805,7 +1837,7 @@
                         <label for="seller1Relation3">Seller 1 Husband/Wife/Daughter Name</label>
                         <input name="seller1Relation" id="seller1Relation3" required>
                     </div>
-                    <hr/>
+                    <hr />
                     <!-- Seller 2 Details -->
                     <div class="form-group">
                         <label for="seller2Name3">Seller 2 Name</label>
@@ -1870,7 +1902,7 @@
                         <input name="unitSize" id="unitSize3" required>
                     </div>
                     <div class="form-group">
-                        <label for="unitType3">Unit Type</label>
+                        <label for="unitType3">Unit Type(Enter capital alphabet only)</label>
                         <input name="unitType" id="unitType3" required>
                     </div>
                     <div class="form-group">
@@ -1883,25 +1915,32 @@
                     </div>
                     <div class="form-group">
                         <label for="propertyName3">Property Name</label>
-                        <select name="propertyName" id="propertyName3" required>
-                            <option value="">Select Property</option>
-                            <option value="ATS PICTURESQUE REPRIEVES PHASE 2">ATS PICTURESQUE REPRIEVES PHASE 2</option>
-                            <option value="ATS Greens">ATS Greens</option>
-                            <option value="ATS Advantage">ATS Advantage</option>
-                            <option value="Other">Other</option>
+                        <option value="">Select Property</option>
+                        <option value="ATS PICTURESQUE REPRIEVES PHASE 2">ATS PICTURESQUE REPRIEVES PHASE 2</option>
+                        <option value="ATS PICTURESQUE REPRIEVES PHASE 1">ATS PICTURESQUE REPRIEVES PHASE 1</option>
+                        <option value="ATS DESTINAIRE">ATS DESTINAIRE</option>
+                        <option value="ATS RHAPSODY">ATS RHAPSODY</option>
+                        <option value="ATS LE GRANDIOSE">ATS LE GRANDIOSE</option>
+                        <option value="ATS PIOUS HIDEAWAYS">ATS PIOUS HIDEAWAYS</option>
+                        <option value="ATS ALLURE">ATS ALLURE</option>
+                        <option value="Other">Other</option>
                         </select>
-                        <input type="text" id="customPropertyName3" name="customPropertyName" placeholder="Enter Property Name"
-                            style="display:none; margin-top:8px;">
+                        <input type="text" id="customPropertyName3" name="customPropertyName"
+                            placeholder="Enter Property Name" style="display:none; margin-top:8px;">
                     </div>
                     <div class="form-group">
                         <label for="propertyAddress3">Property Address</label>
                         <select name="propertyAddress" id="propertyAddress3" required>
                             <option value="">Select Address</option>
-                            <option value="Plot No. 16, Sector 135, Noida, 201301">Plot No. 16, Sector 135, Noida, 201301
+                            <option value="SECTOR-152, NOIDA, DISTRICT- GAUTAM BUDDHA NAGAR, UTTAR PRADESH, 201301">
+                                SECTOR-152, NOIDA, DISTRICT- GAUTAM BUDDHA NAGAR, UTTAR PRADESH, 201301
                             </option>
-                            <option value="Plot No. 17, Sector 150, Noida, 201310">Plot No. 17, Sector 150, Noida, 201310
+                            <option value="SECTOR-1, GREATER NOIDA WEST">SECTOR-1, GREATER NOIDA WEST
                             </option>
-                            <option value="Plot No. 18, Sector 93, Noida, 201304">Plot No. 18, Sector 93, Noida, 201304</option>
+                            <option
+                                value="PLOT NO. GH-12/01, SECTOR-1, GREATER NOIDA, DISTRICT GAUTAM BUDDHA NAGAR, UTTAR PRADESH, INDIA">
+                                PLOT NO. GH-12/01, SECTOR-1, GREATER NOIDA, DISTRICT GAUTAM BUDDHA NAGAR, UTTAR PRADESH,
+                                INDIA</option>
                             <option value="Other">Other</option>
                         </select>
                         <input type="text" id="customPropertyAddress3" name="customPropertyAddress"
@@ -1917,24 +1956,23 @@
                         <label for="companyName3">Company Name</label>
                         <select name="companyName" id="companyName3" required>
                             <option value="">Select Company</option>
-                            <option value="ATS Homes Private Limited">ATS Homes Private Limited</option>
-                            <option value="ATS Infrastructure Ltd">ATS Infrastructure Ltd</option>
-                            <option value="ATS Realty">ATS Realty</option>
+                            <option value="ATS HOMES PRIVATE LIMITED">ATS HOMES PRIVATE LIMITED</option>
+                            <option value="ATS GRAND REALTORS PRIVATE LIMITED">ATS GRAND REALTORS PRIVATE LIMITED
+                            </option>
                             <option value="Other">Other</option>
                         </select>
-                        <input type="text" id="customCompanyName3" name="customCompanyName" placeholder="Enter Company Name"
-                            style="display:none; margin-top:8px;">
+                        <input type="text" id="customCompanyName3" name="customCompanyName"
+                            placeholder="Enter Company Name" style="display:none; margin-top:8px;">
                     </div>
                     <div class="form-group">
                         <label for="companyAddress3">Company Address</label>
                         <select name="companyAddress" id="companyAddress3" required>
                             <option value="">Select Company Address</option>
-                            <option value="Plot No. 16, Sector 135, Noida, 201301">Plot No. 16, Sector 135, Noida, 201301
+                            <option value="711/92, DEEPALI, NEHRU PLACE, NEW DELHI-110019.">711/92, DEEPALI, NEHRU
+                                PLACE, NEW DELHI-110019.
                             </option>
-                            <option value="711/92, Deepali, Nehru Place, New Delhi-110019">711/92, Deepali, Nehru Place, New
-                                Delhi-110019</option>
-                            <option value="ATS Tower, Plot No-16, Sector-135, Noida, Gautam Buddha Nagar, Uttar Pradesh, India">
-                                ATS Tower, Plot No-16, Sector-135, Noida, Gautam Buddha Nagar, Uttar Pradesh, India</option>
+                            <option value="PLOT NO. 16, SECTOR 135, NOIDA, 201301">PLOT NO. 16, SECTOR 135, NOIDA,
+                                201301</option>
                             <option value="Other">Other</option>
                         </select>
                         <input type="text" id="customCompanyAddress3" name="customCompanyAddress"
@@ -1997,7 +2035,7 @@
                         <label for="buyer1Address4">Buyer 1 Address</label>
                         <input name="buyer1Address" id="buyer1Address4" required>
                     </div>
-                    <hr/>
+                    <hr />
                     <!-- Buyer 2 Details -->
                     <div class="form-group">
                         <label for="buyer2Name4">Buyer 2 Name</label>
@@ -2038,7 +2076,7 @@
                         <input name="unitSize" id="unitSize4" required>
                     </div>
                     <div class="form-group">
-                        <label for="unitType4">Unit Type</label>
+                        <label for="unitType4">Unit Type(Enter capital alphabet only)</label>
                         <input name="unitType" id="unitType4" required>
                     </div>
                     <div class="form-group">
@@ -2054,22 +2092,30 @@
                         <select name="propertyName" id="propertyName4" required>
                             <option value="">Select Property</option>
                             <option value="ATS PICTURESQUE REPRIEVES PHASE 2">ATS PICTURESQUE REPRIEVES PHASE 2</option>
-                            <option value="ATS Greens">ATS Greens</option>
-                            <option value="ATS Advantage">ATS Advantage</option>
+                            <option value="ATS PICTURESQUE REPRIEVES PHASE 1">ATS PICTURESQUE REPRIEVES PHASE 1</option>
+                            <option value="ATS DESTINAIRE">ATS DESTINAIRE</option>
+                            <option value="ATS RHAPSODY">ATS RHAPSODY</option>
+                            <option value="ATS LE GRANDIOSE">ATS LE GRANDIOSE</option>
+                            <option value="ATS PIOUS HIDEAWAYS">ATS PIOUS HIDEAWAYS</option>
+                            <option value="ATS ALLURE">ATS ALLURE</option>
                             <option value="Other">Other</option>
                         </select>
-                        <input type="text" id="customPropertyName4" name="customPropertyName" placeholder="Enter Property Name"
-                            style="display:none; margin-top:8px;">
+                        <input type="text" id="customPropertyName4" name="customPropertyName"
+                            placeholder="Enter Property Name" style="display:none; margin-top:8px;">
                     </div>
                     <div class="form-group">
                         <label for="propertyAddress4">Property Address</label>
                         <select name="propertyAddress" id="propertyAddress4" required>
                             <option value="">Select Address</option>
-                            <option value="Plot No. 16, Sector 135, Noida, 201301">Plot No. 16, Sector 135, Noida, 201301
+                            <option value="SECTOR-152, NOIDA, DISTRICT- GAUTAM BUDDHA NAGAR, UTTAR PRADESH, 201301">
+                                SECTOR-152, NOIDA, DISTRICT- GAUTAM BUDDHA NAGAR, UTTAR PRADESH, 201301
                             </option>
-                            <option value="Plot No. 17, Sector 150, Noida, 201310">Plot No. 17, Sector 150, Noida, 201310
+                            <option value="SECTOR-1, GREATER NOIDA WEST">SECTOR-1, GREATER NOIDA WEST
                             </option>
-                            <option value="Plot No. 18, Sector 93, Noida, 201304">Plot No. 18, Sector 93, Noida, 201304</option>
+                            <option
+                                value="PLOT NO. GH-12/01, SECTOR-1, GREATER NOIDA, DISTRICT GAUTAM BUDDHA NAGAR, UTTAR PRADESH, INDIA">
+                                PLOT NO. GH-12/01, SECTOR-1, GREATER NOIDA, DISTRICT GAUTAM BUDDHA NAGAR, UTTAR PRADESH,
+                                INDIA</option>
                             <option value="Other">Other</option>
                         </select>
                         <input type="text" id="customPropertyAddress4" name="customPropertyAddress"
@@ -2085,24 +2131,23 @@
                         <label for="companyName4">Company Name</label>
                         <select name="companyName" id="companyName4" required>
                             <option value="">Select Company</option>
-                            <option value="ATS Homes Private Limited">ATS Homes Private Limited</option>
-                            <option value="ATS Infrastructure Ltd">ATS Infrastructure Ltd</option>
-                            <option value="ATS Realty">ATS Realty</option>
+                            <option value="ATS HOMES PRIVATE LIMITED">ATS HOMES PRIVATE LIMITED</option>
+                            <option value="ATS GRAND REALTORS PRIVATE LIMITED">ATS GRAND REALTORS PRIVATE LIMITED
+                            </option>
                             <option value="Other">Other</option>
                         </select>
-                        <input type="text" id="customCompanyName4" name="customCompanyName" placeholder="Enter Company Name"
-                            style="display:none; margin-top:8px;">
+                        <input type="text" id="customCompanyName4" name="customCompanyName"
+                            placeholder="Enter Company Name" style="display:none; margin-top:8px;">
                     </div>
                     <div class="form-group">
                         <label for="companyAddress4">Company Address</label>
                         <select name="companyAddress" id="companyAddress4" required>
                             <option value="">Select Company Address</option>
-                            <option value="Plot No. 16, Sector 135, Noida, 201301">Plot No. 16, Sector 135, Noida, 201301
+                            <option value="711/92, DEEPALI, NEHRU PLACE, NEW DELHI-110019.">711/92, DEEPALI, NEHRU
+                                PLACE, NEW DELHI-110019.
                             </option>
-                            <option value="711/92, Deepali, Nehru Place, New Delhi-110019">711/92, Deepali, Nehru Place, New
-                                Delhi-110019</option>
-                            <option value="ATS Tower, Plot No-16, Sector-135, Noida, Gautam Buddha Nagar, Uttar Pradesh, India">
-                                ATS Tower, Plot No-16, Sector-135, Noida, Gautam Buddha Nagar, Uttar Pradesh, India</option>
+                            <option value="PLOT NO. 16, SECTOR 135, NOIDA, 201301">PLOT NO. 16, SECTOR 135, NOIDA,
+                                201301</option>
                             <option value="Other">Other</option>
                         </select>
                         <input type="text" id="customCompanyAddress4" name="customCompanyAddress"
@@ -2446,126 +2491,44 @@
             }
 
             // Property Name dropdowns for both forms
-            document.getElementById('propertyName').addEventListener('change', function () {
-                document.getElementById('customPropertyName').style.display = this.value === 'Other' ? 'block' : 'none';
-                if (this.value !== 'Other') document.getElementById('customPropertyName').value = '';
-            });
-            document.getElementById('propertyName2').addEventListener('change', function () {
-                document.getElementById('customPropertyName2').style.display = this.value === 'Other' ? 'block' : 'none';
-                if (this.value !== 'Other') document.getElementById('customPropertyName2').value = '';
-            });
-            document.getElementById('propertyName3').addEventListener('change', function () {
-                document.getElementById('customPropertyName3').style.display = this.value === 'Other' ? 'block' : 'none';
-                if (this.value !== 'Other') document.getElementById('customPropertyName3').value = '';
-            });
-
-            document.getElementById('propertyName4').addEventListener('change', function () {
-                document.getElementById('customPropertyName4').style.display = this.value === 'Other' ? 'block' : 'none';
-                if (this.value !== 'Other') document.getElementById('customPropertyName4').value = '';
-            });
-
+            function handleOtherDropdown(selectId, inputId) {
+                const select = document.getElementById(selectId);
+                const input = document.getElementById(inputId);
+                if (select && input) {
+                    function updateInput() {
+                        if (select.value === 'Other') {
+                            input.style.display = 'block';
+                            input.required = true;
+                        } else {
+                            input.style.display = 'none';
+                            input.value = '';
+                            input.required = false;
+                        }
+                    }
+                    select.addEventListener('change', updateInput);
+                    // Call once on load in case of reload or autofill
+                    updateInput();
+                }
+            }
+            handleOtherDropdown('propertyName', 'customPropertyName');
+            handleOtherDropdown('propertyName2', 'customPropertyName2');
+            handleOtherDropdown('propertyName3', 'customPropertyName3');
+            handleOtherDropdown('propertyName4', 'customPropertyName4');
             // Property Address dropdowns for both forms
-            document.getElementById('propertyAddress').addEventListener('change', function () {
-                document.getElementById('customPropertyAddress').style.display = this.value === 'Other' ? 'block' : 'none';
-                if (this.value !== 'Other') document.getElementById('customPropertyAddress').value = '';
-            });
-            document.getElementById('propertyAddress2').addEventListener('change', function () {
-                document.getElementById('customPropertyAddress2').style.display = this.value === 'Other' ? 'block' : 'none';
-                if (this.value !== 'Other') document.getElementById('customPropertyAddress2').value = '';
-            });
-            document.getElementById('propertyAddress3').addEventListener('change', function () {
-                document.getElementById('customPropertyAddress3').style.display = this.value === 'Other' ? 'block' : 'none';
-                if (this.value !== 'Other') document.getElementById('customPropertyAddress3').value = '';
-            });
-
-            document.getElementById('propertyAddress4').addEventListener('change', function () {
-                document.getElementById('customPropertyAddress4').style.display = this.value === 'Other' ? 'block' : 'none';
-                if (this.value !== 'Other') document.getElementById('customPropertyAddress4').value = '';
-            });
-
-            // Company Name dropdowns for form 1
-            document.getElementById('companyName').addEventListener('change', function () {
-                document.getElementById('customCompanyName').style.display = this.value === 'Other' ? 'block' : 'none';
-                if (this.value !== 'Other') document.getElementById('customCompanyName').value = '';
-            });
-
-            // Company Address dropdowns for form 1
-            document.getElementById('companyAddress').addEventListener('change', function () {
-                document.getElementById('customCompanyAddress').style.display = this.value === 'Other' ? 'block' : 'none';
-                if (this.value !== 'Other') document.getElementById('customCompanyAddress').value = '';
-            });
-
-            // Company Name dropdowns for form 2
-            document.getElementById('companyName2').addEventListener('change', function () {
-                document.getElementById('customCompanyName2').style.display = this.value === 'Other' ? 'block' : 'none';
-                if (this.value !== 'Other') document.getElementById('customCompanyName2').value = '';
-            });
-
-            // Company Address dropdowns for form 2
-            document.getElementById('companyAddress2').addEventListener('change', function () {
-                document.getElementById('customCompanyAddress2').style.display = this.value === 'Other' ? 'block' : 'none';
-                if (this.value !== 'Other') document.getElementById('customCompanyAddress2').value = '';
-            });
-
-            // Company Name dropdowns for form 3
-            document.getElementById('companyName3').addEventListener('change', function () {
-                document.getElementById('customCompanyName3').style.display = this.value === 'Other' ? 'block' : 'none';
-                if (this.value !== 'Other') document.getElementById('customCompanyName3').value = '';
-            });
-
-            // Company Address dropdowns for form 3
-            document.getElementById('companyAddress3').addEventListener('change', function () {
-                document.getElementById('customCompanyAddress3').style.display = this.value === 'Other' ? 'block' : 'none';
-                if (this.value !== 'Other') document.getElementById('customCompanyAddress3').value = '';
-            });
-
-            // Unit Size field (float allowed) for form 3
-            const unitSize3 = document.getElementById('unitSize3');
-            if (unitSize3) {
-                unitSize3.addEventListener('input', function () {
-                    this.value = this.value.replace(/[^0-9.]/g, '');
-                    const parts = this.value.split('.');
-                    if (parts.length > 2) {
-                        this.value = parts[0] + '.' + parts.slice(1).join('');
-                    }
-                    if (/^0[0-9]/.test(this.value)) {
-                        this.value = this.value.replace(/^0+/, '');
-                    }
-                });
-            }
-
-            // Unit Size field (float allowed) for form 4
-            const unitSize4 = document.getElementById('unitSize4');
-            if (unitSize4) {
-                unitSize4.addEventListener('input', function () {
-                    this.value = this.value.replace(/[^0-9.]/g, '');
-                    const parts = this.value.split('.');
-                    if (parts.length > 2) {
-                        this.value = parts[0] + '.' + parts.slice(1).join('');
-                    }
-                    if (/^0[0-9]/.test(this.value)) {
-                        this.value = this.value.replace(/^0+/, '');
-                    }
-                });
-            }
-
-            // Company Address dropdowns for form 3
-            document.getElementById('companyAddress3').addEventListener('change', function () {
-                document.getElementById('customCompanyAddress3').style.display = this.value === 'Other' ? 'block' : 'none';
-                if (this.value !== 'Other') document.getElementById('customCompanyAddress3').value = '';
-            });
-
-            // Company Name dropdowns for form 4
-            document.getElementById('companyName4').addEventListener('change', function () {
-                document.getElementById('customCompanyName4').style.display = this.value === 'Other' ? 'block' : 'none';
-                if (this.value !== 'Other') document.getElementById('customCompanyName4').value = '';
-            });
-
-            // Company Address dropdowns for form 4
-            document.getElementById('companyAddress4').addEventListener('change', function () {
-                document.getElementById('customCompanyAddress4').style.display = this.value === 'Other' ? 'block' : 'none';
-                if (this.value !== 'Other') document.getElementById('customCompanyAddress4').value = '';
-            });
+            handleOtherDropdown('propertyAddress', 'customPropertyAddress');
+            handleOtherDropdown('propertyAddress2', 'customPropertyAddress2');
+            handleOtherDropdown('propertyAddress3', 'customPropertyAddress3');
+            handleOtherDropdown('propertyAddress4', 'customPropertyAddress4');
+            // Company Name dropdowns for all forms
+            handleOtherDropdown('companyName', 'customCompanyName');
+            handleOtherDropdown('companyName2', 'customCompanyName2');
+            handleOtherDropdown('companyName3', 'customCompanyName3');
+            handleOtherDropdown('companyName4', 'customCompanyName4');
+            // Company Address dropdowns for all forms
+            handleOtherDropdown('companyAddress', 'customCompanyAddress');
+            handleOtherDropdown('companyAddress2', 'customCompanyAddress2');
+            handleOtherDropdown('companyAddress3', 'customCompanyAddress3');
+            handleOtherDropdown('companyAddress4', 'customCompanyAddress4');
         });
 
         document.addEventListener("DOMContentLoaded", () => {
