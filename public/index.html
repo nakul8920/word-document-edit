@@ -1534,10 +1534,6 @@
                 <h3>Property Details</h3>
                 <div class="property-grid">
                     <div class="form-group">
-                        <label for="flatNo">Flat No(Enter number only)</label>
-                        <input name="flatNo" id="flatNo" required>
-                    </div>
-                    <div class="form-group">
                         <label for="unitType">Unit Type(Enter capital alphabet only)</label>
                         <input name="unitType" id="unitType" required>
                     </div>
@@ -1722,12 +1718,12 @@
                 <div class="property-grid">
                     <!-- Property Details -->
                     <div class="form-group">
-                        <label for="flatNo2">Flat No</label>
-                        <input name="flatNo" id="flatNo2" required>
-                    </div>
-                    <div class="form-group">
                         <label for="unitNo2">Unit No</label>
                         <input name="unitNo" id="unitNo2" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="unitSize2">Unit Size</label>
+                        <input name="unitSize" id="unitSize2" required>
                     </div>
                     <div class="form-group">
                         <label for="unitType2">Unit Type(Enter capital alphabet only)</label>
@@ -1889,10 +1885,6 @@
             <div class="details-section">
                 <h3>Property Details</h3>
                 <div class="property-grid">
-                    <div class="form-group">
-                        <label for="flatNo3">Flat No</label>
-                        <input name="flatNo" id="flatNo3" required>
-                    </div>
                     <div class="form-group">
                         <label for="unitNo3">Unit No</label>
                         <input name="unitNo" id="unitNo3" required>
@@ -2064,10 +2056,6 @@
             <div class="details-section">
                 <h3>Property Details</h3>
                 <div class="property-grid">
-                    <div class="form-group">
-                        <label for="flatNo4">Flat No</label>
-                        <input name="flatNo" id="flatNo4" required>
-                    </div>
                     <div class="form-group">
                         <label for="unitNo4">Unit No</label>
                         <input name="unitNo" id="unitNo4" required>
@@ -2449,10 +2437,10 @@
 
             // Natural number fields for both forms
             const naturalNumberFields = [
-                'flatNo', 'unitNo', 'floorNo',
-                'flatNo2', 'unitNo2', 'floorNo2',
-                'flatNo3', 'unitNo3', 'floorNo3',
-                'flatNo4', 'unitNo4', 'floorNo4',
+                'unitNo', 'floorNo',
+                'unitNo2', 'floorNo2',
+                'unitNo3', 'floorNo3',
+                'unitNo4', 'floorNo4',
                 'towerNo', 'towerNo2', 'towerNo3', 'towerNo4' // <-- Added towerNo fields
             ];
             naturalNumberFields.forEach(function (id) {
@@ -2589,6 +2577,20 @@
             document.getElementById('optionCard4').addEventListener('click', () => showForm('docForm4'));
         });
 
+        // In the JavaScript section, add input validation for unitSize2 to allow only numbers and a single dot (float).
+        const unitSize2 = document.getElementById('unitSize2');
+        if (unitSize2) {
+            unitSize2.addEventListener('input', function () {
+                this.value = this.value.replace(/[^0-9.]/g, '');
+                const parts = this.value.split('.');
+                if (parts.length > 2) {
+                    this.value = parts[0] + '.' + parts.slice(1).join('');
+                }
+                if (/^0[0-9]/.test(this.value)) {
+                    this.value = this.value.replace(/^0+/, '');
+                }
+            });
+        }
 
     </script>
 </body>
